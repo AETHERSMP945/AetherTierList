@@ -1,126 +1,190 @@
-import json
-import os
-from datetime import datetime
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AetherMC - Minecraft Tier List</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f23;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #00ffcc;
+      margin-bottom: 10px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .tier {
+      margin-bottom: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .tier-header {
+      padding: 12px 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .S { background: #ff2d55; }
+    .A { background: #ff8c00; }
+    .B { background: #ffd700; color: black; }
+    .C { background: #00cc66; }
+    .D { background: #6666ff; }
+    .F { background: #888; }
 
-class AetherMC:
-    def __init__(self, title="AetherMC Tier List"):
-        self.title = title
-        self.version = "1.0"
-        self.created = datetime.now().strftime("%Y-%m-%d")
-        self.tiers = {
-            "S": [], "A": [], "B": [], "C": [], "D": [], "F": []
-        }
+    .items {
+      padding: 15px;
+      background: #1a1a2e;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 80px;
+    }
+    .item {
+      background: #16213e;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: move;
+      user-select: none;
+    }
+    .add-form {
+      text-align: center;
+      margin: 20px 0;
+    }
+    input, select, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      background: #00ffcc;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .clear-btn {
+      background: #ff2d55;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>✦ AetherMC Tier List ✦</h1>
+    <p style="text-align:center;">Minecraft Ranking System</p>
 
-    def add(self, item: str, tier: str = "B"):
-        tier = tier.upper().strip()
-        if tier not in self.tiers:
-            print("❌ Invalid tier! Use S, A, B, C, D, or F.")
-            return False
-        
-        item = item.strip()
-        if not item:
-            print("❌ Item name cannot be empty.")
-            return False
-            
-        if item not in self.tiers[tier]:
-            self.tiers[tier].append(item)
-            print(f"✅ Added '{item}' → {tier} Tier")
-            return True
-        else:
-            print(f"⚠️ '{item}' is already in {tier} Tier")
-            return False
+    <div class="add-form">
+      <input type="text" id="itemName" placeholder="Item / Mob / Thing" />
+      <select id="tierSelect">
+        <option value="S">S Tier</option>
+        <option value="A">A Tier</option>
+        <option value="B" selected>B Tier</option>
+        <option value="C">C Tier</option>
+        <option value="D">D Tier</option>
+        <option value="F">F Tier</option>
+      </select>
+      <button onclick="addItem()">Add</button>
+      <button onclick="saveData()" style="background:#00ccff;">Save</button>
+      <button onclick="clearAll()" class="clear-btn">Clear All</button>
+    </div>
 
-    def remove(self, item: str):
-        for tier in self.tiers:
-            if item in self.tiers[tier]:
-                self.tiers[tier].remove(item)
-                print(f"🗑 Removed '{item}' from {tier} Tier")
-                return True
-        print(f"❌ '{item}' not found.")
-        return False
+    <div id="tiers"></div>
+  </div>
 
-    def move(self, item: str, new_tier: str):
-        self.remove(item)
-        self.add(item, new_tier)
+  <script>
+    const tiersData = {
+      "S": [], "A": [], "B": [], "C": [], "D": [], "F": []
+    };
 
-    def display(self):
-        print("\n" + "═" * 60)
-        print(f"                    {self.title.upper()}")
-        print(f"                          v{self.version} - {self.created}")
-        print("═" * 60 + "\n")
-        
-        tier_order = ["S", "A", "B", "C", "D", "F"]
-        colors = {"S": "🔥", "A": "💎", "B": "⭐", "C": "✅", "D": "⚠️", "F": "💀"}
-        
-        for tier in tier_order:
-            items = sorted(self.tiers.get(tier, []))
-            if items:
-                print(f"{colors[tier]} {tier} Tier ({len(items)})")
-                for item in items:
-                    print(f"   • {item}")
-                print()
+    function render() {
+      const container = document.getElementById('tiers');
+      container.innerHTML = '';
 
-    def save(self):
-        os.makedirs("data/tierlists", exist_ok=True)
-        data = {
-            "title": self.title,
-            "version": self.version,
-            "created": self.created,
-            "tiers": self.tiers
-        }
-        with open("data/tierlists/aether_save.json", 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2)
-        print("💾 Saved to data/tierlists/aether_save.json")
+      const order = ["S", "A", "B", "C", "D", "F"];
+      const colors = {S:"S", A:"A", B:"B", C:"C", D:"D", F:"F"};
 
-    def load(self):
-        try:
-            with open("data/tierlists/aether_save.json", 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            self.title = data.get("title", self.title)
-            self.tiers = data.get("tiers", self.tiers)
-            print("✅ Loaded previous save!")
-            return True
-        except FileNotFoundError:
-            print("📁 No save file yet. Starting fresh.")
-            return False
+      order.forEach(tier => {
+        const div = document.createElement('div');
+        div.className = `tier ${tier}`;
+        div.innerHTML = `
+          <div class="tier-header">${tier} Tier (${tiersData[tier].length})</div>
+          <div class="items" ondrop="drop(event)" ondragover="allowDrop(event)" data-tier="${tier}">
+            ${tiersData[tier].map(item => `
+              <div class="item" draggable="true" ondragstart="drag(event)" data-item="${item}">
+                ${item}
+              </div>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
 
+    function addItem() {
+      const name = document.getElementById('itemName').value.trim();
+      const tier = document.getElementById('tierSelect').value;
+      
+      if (!name) return alert("Please enter an item name");
+      
+      if (!tiersData[tier].includes(name)) {
+        tiersData[tier].push(name);
+        document.getElementById('itemName').value = '';
+        render();
+      }
+    }
 
-# ==================== RUN THE PROGRAM ====================
-if __name__ == "__main__":
-    print("✦ Welcome to AetherMC ✦\n")
-    
-    aether = AetherMC("AetherMC - My Minecraft Tier List")
-    aether.load()
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
 
-    while True:
-        print("\n" + "─" * 50)
-        print("1. Show Tier List")
-        print("2. Add Item")
-        print("3. Move Item")
-        print("4. Remove Item")
-        print("5. Save")
-        print("6. Exit")
-        print("─" * 50)
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.getAttribute("data-item"));
+      ev.dataTransfer.setData("fromTier", ev.target.parentElement.getAttribute("data-tier"));
+    }
 
-        choice = input("\nChoose option (1-6): ").strip()
+    function drop(ev) {
+      ev.preventDefault();
+      const itemName = ev.dataTransfer.getData("text");
+      const fromTier = ev.dataTransfer.getData("fromTier");
+      const toTier = ev.target.getAttribute("data-tier") || ev.target.closest('.items').getAttribute("data-tier");
 
-        if choice == "1":
-            aether.display()
-        elif choice == "2":
-            item = input("Item Name: ").strip()
-            tier = input("Tier (S/A/B/C/D/F): ").strip()
-            aether.add(item, tier)
-        elif choice == "3":
-            item = input("Item Name: ").strip()
-            tier = input("New Tier: ").strip()
-            aether.move(item, tier)
-        elif choice == "4":
-            item = input("Item Name to remove: ").strip()
-            aether.remove(item)
-        elif choice == "5":
-            aether.save()
-        elif choice == "6":
-            print("👋 Thanks for using AetherMC!")
-            break
-        else:
-            print("Invalid choice, try again.")
+      if (fromTier === toTier) return;
+
+      // Remove from old tier
+      tiersData[fromTier] = tiersData[fromTier].filter(item => item !== itemName);
+      // Add to new tier
+      if (!tiersData[toTier].includes(itemName)) {
+        tiersData[toTier].push(itemName);
+      }
+      render();
+    }
+
+    function saveData() {
+      localStorage.setItem('aethermc_tierlist', JSON.stringify(tiersData));
+      alert("✅ Saved! (in your browser)");
+    }
+
+    function clearAll() {
+      if (confirm("Delete everything?")) {
+        Object.keys(tiersData).forEach(key => tiersData[key] = []);
+        render();
+      }
+    }
+
+    // Load saved data
+    const saved = localStorage.getItem('aethermc_tierlist');
+    if (saved) {
+      Object.assign(tiersData, JSON.parse(saved));
+    }
+
+    render();
+  </script>
+</body>
+</html>
