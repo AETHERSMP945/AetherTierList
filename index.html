@@ -1,108 +1,126 @@
-!function() {
-    var e = {
-        36: function(e, n) {
-            "use strict";
-            Object.defineProperty(n, "__esModule", {
-                value: !0
-            }),
-            n.sendObjectBeacon = function(e, n, t, r, i) {
-                void 0 === r && (r = !1),
-                void 0 === i && (i = null);
-                var o = i || "/cdn-cgi/rum?".concat(e)
-                  , a = !0;
-                if (navigator && "string" == typeof navigator.userAgent)
-                    try {
-                        var c = navigator.userAgent.match(/Chrome\/([0-9]+)/);
-                        c && c[0].toLowerCase().indexOf("chrome") > -1 && parseInt(c[1]) < 81 && (a = !1)
-                    } catch (e) {}
-                if (navigator && "function" == typeof navigator.sendBeacon && a && r) {
-                    n.st = 1;
-                    var u = JSON.stringify(n)
-                      , s = navigator.sendBeacon && navigator.sendBeacon.bind(navigator);
-                    null == s || s(o, new Blob([u],{
-                        type: "application/json"
-                    }))
-                } else {
-                    n.st = 2,
-                    u = JSON.stringify(n);
-                    var f = new XMLHttpRequest;
-                    t && (f.onreadystatechange = function() {
-                        4 == this.readyState && 204 == this.status && t()
-                    }
-                    ),
-                    f.open("POST", o, !0),
-                    f.setRequestHeader("content-type", "application/json"),
-                    f.send(u)
-                }
-            }
-        },
-        173: function(e, n) {
-            !function(e) {
-                "use strict";
-                var n, t, r, i, o, a = function() {
-                    return window.performance && performance.getEntriesByType && performance.getEntriesByType("navigation")[0]
-                }, c = function(e) {
-                    if ("loading" === document.readyState)
-                        return "loading";
-                    var n = a();
-                    if (n) {
-                        if (e < n.domInteractive)
-                            return "loading";
-                        if (0 === n.domContentLoadedEventStart || e < n.domContentLoadedEventStart)
-                            return "dom-interactive";
-                        if (0 === n.domComplete || e < n.domComplete)
-                            return "dom-content-loaded"
-                    }
-                    return "complete"
-                }, u = function(e) {
-                    var n = e.nodeName;
-                    return 1 === e.nodeType ? n.toLowerCase() : n.toUpperCase().replace(/^#/, "")
-                }, s = function(e, n) {
-                    var t = "";
-                    try {
-                        for (; e && 9 !== e.nodeType; ) {
-                            var r = e
-                              , i = r.id ? "#" + r.id : u(r) + (r.classList && r.classList.value && r.classList.value.trim() && r.classList.value.trim().length ? "." + r.classList.value.trim().replace(/\s+/g, ".") : "");
-                            if (t.length + i.length > (n || 100) - 1)
-                                return t || i;
-                            if (t = t ? i + ">" + t : i,
-                            r.id)
-                                break;
-                            e = r.parentNode
-                        }
-                    } catch (e) {}
-                    return t
-                }, f = -1, l = function() {
-                    return f
-                }, d = function(e) {
-                    addEventListener("pageshow", function(n) {
-                        n.persisted && (f = n.timeStamp,
-                        e(n))
-                    }, !0)
-                }, v = function() {
-                    var e = a();
-                    return e && e.activationStart || 0
-                }, p = function(e, n) {
-                    var t = a()
-                      , r = "navigate";
-                    return l() >= 0 ? r = "back-forward-cache" : t && (document.prerendering || v() > 0 ? r = "prerender" : document.wasDiscarded ? r = "restore" : t.type && (r = t.type.replace(/_/g, "-"))),
-                    {
-                        name: e,
-                        value: void 0 === n ? -1 : n,
-                        rating: "good",
-                        delta: 0,
-                        entries: [],
-                        id: "v3-".concat(Date.now(), "-").concat(Math.floor(8999999999999 * Math.random()) + 1e12),
-                        navigationType: r
-                    }
-                }, m = function(e, n, t) {
-                    try {
-                        if (PerformanceObserver.supportedEntryTypes.includes(e)) {
-                            var r = new PerformanceObserver(function(e) {
-                                Promise.resolve().then(function() {
-                                    n(e.getEntries())
-                                })
-                            }
-                            );
-                            return r.observe(Object.assign({
-                                type: e,
+import json
+import os
+from datetime import datetime
+
+class AetherMC:
+    def __init__(self, title="AetherMC Tier List"):
+        self.title = title
+        self.version = "1.0"
+        self.created = datetime.now().strftime("%Y-%m-%d")
+        self.tiers = {
+            "S": [], "A": [], "B": [], "C": [], "D": [], "F": []
+        }
+
+    def add(self, item: str, tier: str = "B"):
+        tier = tier.upper().strip()
+        if tier not in self.tiers:
+            print("❌ Invalid tier! Use S, A, B, C, D, or F.")
+            return False
+        
+        item = item.strip()
+        if not item:
+            print("❌ Item name cannot be empty.")
+            return False
+            
+        if item not in self.tiers[tier]:
+            self.tiers[tier].append(item)
+            print(f"✅ Added '{item}' → {tier} Tier")
+            return True
+        else:
+            print(f"⚠️ '{item}' is already in {tier} Tier")
+            return False
+
+    def remove(self, item: str):
+        for tier in self.tiers:
+            if item in self.tiers[tier]:
+                self.tiers[tier].remove(item)
+                print(f"🗑 Removed '{item}' from {tier} Tier")
+                return True
+        print(f"❌ '{item}' not found.")
+        return False
+
+    def move(self, item: str, new_tier: str):
+        self.remove(item)
+        self.add(item, new_tier)
+
+    def display(self):
+        print("\n" + "═" * 60)
+        print(f"                    {self.title.upper()}")
+        print(f"                          v{self.version} - {self.created}")
+        print("═" * 60 + "\n")
+        
+        tier_order = ["S", "A", "B", "C", "D", "F"]
+        colors = {"S": "🔥", "A": "💎", "B": "⭐", "C": "✅", "D": "⚠️", "F": "💀"}
+        
+        for tier in tier_order:
+            items = sorted(self.tiers.get(tier, []))
+            if items:
+                print(f"{colors[tier]} {tier} Tier ({len(items)})")
+                for item in items:
+                    print(f"   • {item}")
+                print()
+
+    def save(self):
+        os.makedirs("data/tierlists", exist_ok=True)
+        data = {
+            "title": self.title,
+            "version": self.version,
+            "created": self.created,
+            "tiers": self.tiers
+        }
+        with open("data/tierlists/aether_save.json", 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2)
+        print("💾 Saved to data/tierlists/aether_save.json")
+
+    def load(self):
+        try:
+            with open("data/tierlists/aether_save.json", 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            self.title = data.get("title", self.title)
+            self.tiers = data.get("tiers", self.tiers)
+            print("✅ Loaded previous save!")
+            return True
+        except FileNotFoundError:
+            print("📁 No save file yet. Starting fresh.")
+            return False
+
+
+# ==================== RUN THE PROGRAM ====================
+if __name__ == "__main__":
+    print("✦ Welcome to AetherMC ✦\n")
+    
+    aether = AetherMC("AetherMC - My Minecraft Tier List")
+    aether.load()
+
+    while True:
+        print("\n" + "─" * 50)
+        print("1. Show Tier List")
+        print("2. Add Item")
+        print("3. Move Item")
+        print("4. Remove Item")
+        print("5. Save")
+        print("6. Exit")
+        print("─" * 50)
+
+        choice = input("\nChoose option (1-6): ").strip()
+
+        if choice == "1":
+            aether.display()
+        elif choice == "2":
+            item = input("Item Name: ").strip()
+            tier = input("Tier (S/A/B/C/D/F): ").strip()
+            aether.add(item, tier)
+        elif choice == "3":
+            item = input("Item Name: ").strip()
+            tier = input("New Tier: ").strip()
+            aether.move(item, tier)
+        elif choice == "4":
+            item = input("Item Name to remove: ").strip()
+            aether.remove(item)
+        elif choice == "5":
+            aether.save()
+        elif choice == "6":
+            print("👋 Thanks for using AetherMC!")
+            break
+        else:
+            print("Invalid choice, try again.")
