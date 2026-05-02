@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AetherMC - Rankings</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      margin: 0;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    h1 {
+      color: #00ffcc;
+      font-size: 42px;
+      margin: 0;
+    }
+    .subtitle {
+      color: #888;
+      font-size: 18px;
+    }
+    table {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: #111118;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th {
+      background: #1a1a24;
+      padding: 16px;
+      text-align: left;
+      color: #00ffcc;
+    }
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #222;
+    }
+    tr:hover {
+      background: #1f1f2b;
+    }
+    .rank {
+      font-size: 22px;
+      font-weight: bold;
+      width: 60px;
+    }
+    .player {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .skin {
+      width: 40px;
+      height: 40px;
+      background: #333;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .rank-title {
+      color: #ffd700;
+      font-size: 14px;
+    }
+    .region {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .NA { background: #ff4444; }
+    .EU { background: #44aaee; }
+    .tier-icon {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>✦ AetherMC ✦</h1>
+    <p class="subtitle">Minecraft Competitive Rankings</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th>Rank</th>
+        <th>Region</th>
+        <th>Points</th>
+      </tr>
+    </thead>
+    <tbody id="rankingBody">
+      <!-- Data will be added by JavaScript -->
+    </tbody>
+  </table>
+
+  <script>
+    let players = [
+      { rank: 1, name: "YourName", title: "Combat Grandmaster", points: 450, region: "NA" },
+      { rank: 2, name: "Player2", title: "Combat Master", points: 330, region: "EU" },
+      { rank: 3, name: "Player3", title: "Combat Master", points: 290, region: "NA" },
+      { rank: 4, name: "idree", title: "Combat Ace", points: 245, region: "EU" },
+    ];
+
+    function renderTable() {
+      const tbody = document.getElementById('rankingBody');
+      tbody.innerHTML = '';
+
+      players.sort((a, b) => b.points - a.points);
+
+      players.forEach((player, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="rank">${index + 1}</td>
+          <td>
+            <div class="player">
+              <div class="skin">👾</div>
+              <div>
+                <strong>${player.name}</strong><br>
+                <span class="rank-title">${player.title}</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="region ${player.region}">${player.region}</span></td>
+          <td><strong>${player.points}</strong> pts</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Add new player
+    function addPlayer() {
+      const name = prompt("Enter Player Name:");
+      if (!name) return;
+      
+      const points = parseInt(prompt("Enter Points:", "200"));
+      if (isNaN(points)) return;
+
+      const region = confirm("Is this player from NA?") ? "NA" : "EU";
+
+      players.push({
+        rank: players.length + 1,
+        name: name,
+        title: points > 400 ? "Combat Grandmaster" : points > 300 ? "Combat Master" : "Combat Ace",
+        points: points,
+        region: region
+      });
+
+      renderTable();
+    }
+
+    // Initial render
+    renderTable();
+
+    // Add a button at bottom
+    const btn = document.createElement('button');
+    btn.textContent = "+ Add Player";
+    btn.style = "display:block; margin:30px auto; padding:12px 24px; font-size:18px; background:#00ffcc; color:black; border:none; border-radius:8px; cursor:pointer;";
+    btn.onclick = addPlayer;
+    document.body.appendChild(btn);
+  </script>
+</body>
+</html>
