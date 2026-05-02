@@ -5,167 +5,162 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AetherMC - Rankings</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #0a0a0f;
-      color: #e0e0e0;
-      margin: 0;
-      padding: 20px;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    h1 {
-      color: #00ffcc;
-      font-size: 42px;
-      margin: 0;
-    }
-    .subtitle {
-      color: #888;
-      font-size: 18px;
-    }
-    table {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      border-collapse: collapse;
-      background: #111118;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    th {
-      background: #1a1a24;
-      padding: 16px;
-      text-align: left;
-      color: #00ffcc;
-    }
-    td {
-      padding: 14px 16px;
-      border-bottom: 1px solid #222;
-    }
-    tr:hover {
-      background: #1f1f2b;
-    }
-    .rank {
-      font-size: 22px;
-      font-weight: bold;
-      width: 60px;
-    }
-    .player {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .skin {
-      width: 40px;
-      height: 40px;
-      background: #333;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    .rank-title {
-      color: #ffd700;
-      font-size: 14px;
-    }
-    .region {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: bold;
-    }
-    .NA { background: #ff4444; }
-    .EU { background: #44aaee; }
-    .tier-icon {
-      font-size: 20px;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #0a0a0f; color: #e0e0e0; margin: 0; padding: 20px; }
+    .header { text-align: center; cursor: pointer; }
+    h1 { color: #00ffcc; margin: 0; }
+    .discord { text-align: center; margin: 10px; }
+    .search { width: 300px; padding: 10px; margin: 20px auto; display: block; background: #1a1a2e; border: none; border-radius: 8px; color: white; }
+    
+    table { width: 100%; max-width: 1100px; margin: 20px auto; border-collapse: collapse; background: #111118; border-radius: 12px; }
+    th, td { padding: 14px; text-align: left; }
+    th { background: #1f1f2b; }
+    tr:hover { background: #1f1f2b; }
+
+    .region { padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+    .NA { background: #ff4444; } .EU { background: #4488ff; } .AS { background: #ffaa00; }
+    .AU { background: #00cc88; } .SA { background: #bb44ff; }
+
+    .admin-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border-radius: 12px; width: 90%; max-width: 600px; z-index: 100; }
+    .gamemode-icon { width: 28px; height: 28px; vertical-align: middle; margin-right: 8px; }
   </style>
 </head>
 <body>
-  <div class="header">
+
+  <div class="header" onclick="openAdmin()">
     <h1>✦ AetherMC ✦</h1>
-    <p class="subtitle">Minecraft Competitive Rankings</p>
+    <p>Minecraft Competitive Rankings</p>
   </div>
+
+  <div class="discord">
+    <a href="https://discord.gg/Q7PawrFqAu" target="_blank">Join Discord</a>
+  </div>
+
+  <input type="text" class="search" id="searchInput" placeholder="Search players..." onkeyup="searchPlayers()">
 
   <table>
     <thead>
       <tr>
         <th>#</th>
         <th>Player</th>
-        <th>Rank</th>
         <th>Region</th>
+        <th>Gamemodes</th>
         <th>Points</th>
       </tr>
     </thead>
-    <tbody id="rankingBody">
-      <!-- Data will be added by JavaScript -->
-    </tbody>
+    <tbody id="rankingBody"></tbody>
   </table>
 
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" class="admin-panel">
+    <h2>Admin Panel</h2>
+    <input type="password" id="adminPass" placeholder="Password" style="width:100%; padding:10px; margin:10px 0;">
+    <button onclick="checkPassword()">Login</button>
+    <button onclick="closeAdmin()">Cancel</button>
+
+    <div id="adminContent" style="display:none;">
+      <h3>Add / Edit Player</h3>
+      <input type="text" id="playerName" placeholder="Player Name">
+      <select id="playerRegion">
+        <option value="NA">NA</option>
+        <option value="EU">EU</option>
+        <option value="AS">AS</option>
+        <option value="AU">AU</option>
+        <option value="SA">SA</option>
+      </select>
+      <input type="number" id="playerPoints" placeholder="Points" value="100">
+      
+      <p>Gamemodes:</p>
+      <div id="gamemodeSelect"></div>
+
+      <button onclick="addPlayerToDB()">Add Player</button>
+      <button onclick="closeAdmin()">Close</button>
+    </div>
+  </div>
+
   <script>
-    let players = [
-      { rank: 1, name: "YourName", title: "Combat Grandmaster", points: 450, region: "NA" },
-      { rank: 2, name: "Player2", title: "Combat Master", points: 330, region: "EU" },
-      { rank: 3, name: "Player3", title: "Combat Master", points: 290, region: "NA" },
-      { rank: 4, name: "idree", title: "Combat Ace", points: 245, region: "EU" },
+    let players = JSON.parse(localStorage.getItem('aetherPlayers')) || [];
+
+    const gamemodes = [
+      {name: "Sword", icon: "https://mctiers.com/tier_icons/sword.svg"},
+      {name: "Axe", icon: "https://mctiers.com/tier_icons/axe.svg"},
+      {name: "Mace", icon: "https://mctiers.com/tier_icons/mace.svg"},
+      {name: "NethOP", icon: "https://mctiers.com/tier_icons/nethop.svg"},
+      {name: "Pot", icon: "https://mctiers.com/tier_icons/pot.svg"},
+      {name: "SMP", icon: "https://mctiers.com/tier_icons/smp.svg"},
+      {name: "UHC", icon: "https://mctiers.com/tier_icons/uhc.svg"},
+      {name: "Vanilla", icon: "https://mctiers.com/tier_icons/vanilla.svg"}
     ];
 
-    function renderTable() {
+    function renderTable(filteredPlayers = players) {
       const tbody = document.getElementById('rankingBody');
       tbody.innerHTML = '';
 
-      players.sort((a, b) => b.points - a.points);
+      filteredPlayers.sort((a, b) => b.points - a.points);
 
-      players.forEach((player, index) => {
+      filteredPlayers.forEach((p, i) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td class="rank">${index + 1}</td>
-          <td>
-            <div class="player">
-              <div class="skin">👾</div>
-              <div>
-                <strong>${player.name}</strong><br>
-                <span class="rank-title">${player.title}</span>
-              </div>
-            </div>
-          </td>
-          <td><span class="region ${player.region}">${player.region}</span></td>
-          <td><strong>${player.points}</strong> pts</td>
+          <td>${i+1}</td>
+          <td><strong>${p.name}</strong></td>
+          <td><span class="region ${p.region}">${p.region}</span></td>
+          <td>${p.gamemodes ? p.gamemodes.map(g => `<img src="${g.icon}" class="gamemode-icon" title="${g.name}">`).join('') : ''}</td>
+          <td><strong>${p.points}</strong></td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    // Add new player
-    function addPlayer() {
-      const name = prompt("Enter Player Name:");
-      if (!name) return;
-      
-      const points = parseInt(prompt("Enter Points:", "200"));
-      if (isNaN(points)) return;
+    function searchPlayers() {
+      const term = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = players.filter(p => p.name.toLowerCase().includes(term));
+      renderTable(filtered);
+    }
 
-      const region = confirm("Is this player from NA?") ? "NA" : "EU";
+    function openAdmin() {
+      document.getElementById('adminPanel').style.display = 'block';
+      document.getElementById('adminPass').focus();
+    }
 
-      players.push({
-        rank: players.length + 1,
-        name: name,
-        title: points > 400 ? "Combat Grandmaster" : points > 300 ? "Combat Master" : "Combat Ace",
-        points: points,
-        region: region
-      });
+    function checkPassword() {
+      if (document.getElementById('adminPass').value === "aetherisbest") {
+        document.getElementById('adminContent').style.display = 'block';
+        renderGamemodeCheckboxes();
+      } else {
+        alert("Wrong Password!");
+      }
+    }
 
+    function renderGamemodeCheckboxes() {
+      const div = document.getElementById('gamemodeSelect');
+      div.innerHTML = gamemodes.map(g => `
+        <label><input type="checkbox" value='${JSON.stringify(g)}'> <img src="${g.icon}" class="gamemode-icon"> ${g.name}</label><br>
+      `).join('');
+    }
+
+    function addPlayerToDB() {
+      const name = document.getElementById('playerName').value.trim();
+      if (!name) return alert("Enter player name");
+
+      const region = document.getElementById('playerRegion').value;
+      const points = parseInt(document.getElementById('playerPoints').value) || 0;
+
+      const selectedGamemodes = Array.from(document.querySelectorAll('#gamemodeSelect input:checked')).map(cb => JSON.parse(cb.value));
+
+      players.push({ name, region, points, gamemodes: selectedGamemodes });
+
+      localStorage.setItem('aetherPlayers', JSON.stringify(players));
       renderTable();
+      alert("Player added successfully!");
+    }
+
+    function closeAdmin() {
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('adminContent').style.display = 'none';
+      document.getElementById('adminPass').value = '';
     }
 
     // Initial render
     renderTable();
-
-    // Add a button at bottom
-    const btn = document.createElement('button');
-    btn.textContent = "+ Add Player";
-    btn.style = "display:block; margin:30px auto; padding:12px 24px; font-size:18px; background:#00ffcc; color:black; border:none; border-radius:8px; cursor:pointer;";
-    btn.onclick = addPlayer;
-    document.body.appendChild(btn);
   </script>
 </body>
 </html>
