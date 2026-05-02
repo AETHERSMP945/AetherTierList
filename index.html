@@ -3,188 +3,169 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AetherMC - Minecraft Tier List</title>
+  <title>AetherMC - Rankings</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f0f23;
-      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0a0a0f;
+      color: #e0e0e0;
       margin: 0;
       padding: 20px;
     }
-    h1 {
+    .header {
       text-align: center;
+      margin-bottom: 30px;
+    }
+    h1 {
       color: #00ffcc;
-      margin-bottom: 10px;
+      font-size: 42px;
+      margin: 0;
     }
-    .container {
-      max-width: 1100px;
+    .subtitle {
+      color: #888;
+      font-size: 18px;
+    }
+    table {
+      width: 100%;
+      max-width: 1200px;
       margin: 0 auto;
-    }
-    .tier {
-      margin-bottom: 20px;
-      border-radius: 8px;
+      border-collapse: collapse;
+      background: #111118;
+      border-radius: 12px;
       overflow: hidden;
     }
-    .tier-header {
-      padding: 12px 20px;
-      font-size: 24px;
-      font-weight: bold;
+    th {
+      background: #1a1a24;
+      padding: 16px;
+      text-align: left;
+      color: #00ffcc;
     }
-    .S { background: #ff2d55; }
-    .A { background: #ff8c00; }
-    .B { background: #ffd700; color: black; }
-    .C { background: #00cc66; }
-    .D { background: #6666ff; }
-    .F { background: #888; }
-
-    .items {
-      padding: 15px;
-      background: #1a1a2e;
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #222;
+    }
+    tr:hover {
+      background: #1f1f2b;
+    }
+    .rank {
+      font-size: 22px;
+      font-weight: bold;
+      width: 60px;
+    }
+    .player {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      min-height: 80px;
+      align-items: center;
+      gap: 12px;
     }
-    .item {
-      background: #16213e;
-      padding: 10px 16px;
+    .skin {
+      width: 40px;
+      height: 40px;
+      background: #333;
       border-radius: 6px;
-      cursor: move;
-      user-select: none;
+      overflow: hidden;
     }
-    .add-form {
-      text-align: center;
-      margin: 20px 0;
+    .rank-title {
+      color: #ffd700;
+      font-size: 14px;
     }
-    input, select, button {
-      padding: 10px;
-      margin: 5px;
-      border-radius: 6px;
-      border: none;
-    }
-    button {
-      background: #00ffcc;
-      color: black;
+    .region {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 13px;
       font-weight: bold;
-      cursor: pointer;
     }
-    .clear-btn {
-      background: #ff2d55;
-      color: white;
+    .NA { background: #ff4444; }
+    .EU { background: #44aaee; }
+    .tier-icon {
+      font-size: 20px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>✦ AetherMC Tier List ✦</h1>
-    <p style="text-align:center;">Minecraft Ranking System</p>
-
-    <div class="add-form">
-      <input type="text" id="itemName" placeholder="Item / Mob / Thing" />
-      <select id="tierSelect">
-        <option value="S">S Tier</option>
-        <option value="A">A Tier</option>
-        <option value="B" selected>B Tier</option>
-        <option value="C">C Tier</option>
-        <option value="D">D Tier</option>
-        <option value="F">F Tier</option>
-      </select>
-      <button onclick="addItem()">Add</button>
-      <button onclick="saveData()" style="background:#00ccff;">Save</button>
-      <button onclick="clearAll()" class="clear-btn">Clear All</button>
-    </div>
-
-    <div id="tiers"></div>
+  <div class="header">
+    <h1>✦ AetherMC ✦</h1>
+    <p class="subtitle">Minecraft Competitive Rankings</p>
   </div>
 
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th>Rank</th>
+        <th>Region</th>
+        <th>Points</th>
+      </tr>
+    </thead>
+    <tbody id="rankingBody">
+      <!-- Data will be added by JavaScript -->
+    </tbody>
+  </table>
+
   <script>
-    const tiersData = {
-      "S": [], "A": [], "B": [], "C": [], "D": [], "F": []
-    };
+    let players = [
+      { rank: 1, name: "YourName", title: "Combat Grandmaster", points: 450, region: "NA" },
+      { rank: 2, name: "Player2", title: "Combat Master", points: 330, region: "EU" },
+      { rank: 3, name: "Player3", title: "Combat Master", points: 290, region: "NA" },
+      { rank: 4, name: "idree", title: "Combat Ace", points: 245, region: "EU" },
+    ];
 
-    function render() {
-      const container = document.getElementById('tiers');
-      container.innerHTML = '';
+    function renderTable() {
+      const tbody = document.getElementById('rankingBody');
+      tbody.innerHTML = '';
 
-      const order = ["S", "A", "B", "C", "D", "F"];
-      const colors = {S:"S", A:"A", B:"B", C:"C", D:"D", F:"F"};
+      players.sort((a, b) => b.points - a.points);
 
-      order.forEach(tier => {
-        const div = document.createElement('div');
-        div.className = `tier ${tier}`;
-        div.innerHTML = `
-          <div class="tier-header">${tier} Tier (${tiersData[tier].length})</div>
-          <div class="items" ondrop="drop(event)" ondragover="allowDrop(event)" data-tier="${tier}">
-            ${tiersData[tier].map(item => `
-              <div class="item" draggable="true" ondragstart="drag(event)" data-item="${item}">
-                ${item}
+      players.forEach((player, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="rank">${index + 1}</td>
+          <td>
+            <div class="player">
+              <div class="skin">👾</div>
+              <div>
+                <strong>${player.name}</strong><br>
+                <span class="rank-title">${player.title}</span>
               </div>
-            `).join('')}
-          </div>
+            </div>
+          </td>
+          <td><span class="region ${player.region}">${player.region}</span></td>
+          <td><strong>${player.points}</strong> pts</td>
         `;
-        container.appendChild(div);
+        tbody.appendChild(row);
       });
     }
 
-    function addItem() {
-      const name = document.getElementById('itemName').value.trim();
-      const tier = document.getElementById('tierSelect').value;
+    // Add new player
+    function addPlayer() {
+      const name = prompt("Enter Player Name:");
+      if (!name) return;
       
-      if (!name) return alert("Please enter an item name");
-      
-      if (!tiersData[tier].includes(name)) {
-        tiersData[tier].push(name);
-        document.getElementById('itemName').value = '';
-        render();
-      }
+      const points = parseInt(prompt("Enter Points:", "200"));
+      if (isNaN(points)) return;
+
+      const region = confirm("Is this player from NA?") ? "NA" : "EU";
+
+      players.push({
+        rank: players.length + 1,
+        name: name,
+        title: points > 400 ? "Combat Grandmaster" : points > 300 ? "Combat Master" : "Combat Ace",
+        points: points,
+        region: region
+      });
+
+      renderTable();
     }
 
-    function allowDrop(ev) {
-      ev.preventDefault();
-    }
+    // Initial render
+    renderTable();
 
-    function drag(ev) {
-      ev.dataTransfer.setData("text", ev.target.getAttribute("data-item"));
-      ev.dataTransfer.setData("fromTier", ev.target.parentElement.getAttribute("data-tier"));
-    }
-
-    function drop(ev) {
-      ev.preventDefault();
-      const itemName = ev.dataTransfer.getData("text");
-      const fromTier = ev.dataTransfer.getData("fromTier");
-      const toTier = ev.target.getAttribute("data-tier") || ev.target.closest('.items').getAttribute("data-tier");
-
-      if (fromTier === toTier) return;
-
-      // Remove from old tier
-      tiersData[fromTier] = tiersData[fromTier].filter(item => item !== itemName);
-      // Add to new tier
-      if (!tiersData[toTier].includes(itemName)) {
-        tiersData[toTier].push(itemName);
-      }
-      render();
-    }
-
-    function saveData() {
-      localStorage.setItem('aethermc_tierlist', JSON.stringify(tiersData));
-      alert("✅ Saved! (in your browser)");
-    }
-
-    function clearAll() {
-      if (confirm("Delete everything?")) {
-        Object.keys(tiersData).forEach(key => tiersData[key] = []);
-        render();
-      }
-    }
-
-    // Load saved data
-    const saved = localStorage.getItem('aethermc_tierlist');
-    if (saved) {
-      Object.assign(tiersData, JSON.parse(saved));
-    }
-
-    render();
+    // Add a button at bottom
+    const btn = document.createElement('button');
+    btn.textContent = "+ Add Player";
+    btn.style = "display:block; margin:30px auto; padding:12px 24px; font-size:18px; background:#00ffcc; color:black; border:none; border-radius:8px; cursor:pointer;";
+    btn.onclick = addPlayer;
+    document.body.appendChild(btn);
   </script>
 </body>
 </html>
