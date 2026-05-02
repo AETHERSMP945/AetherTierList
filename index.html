@@ -13,6 +13,7 @@
     table { width: 100%; max-width: 1200px; margin: 20px auto; border-collapse: collapse; background: #111118; border-radius: 12px; overflow: hidden; }
     th, td { padding: 14px 16px; text-align: left; }
     th { background: #1f1f2b; }
+    tr { cursor: move; }
     tr:hover { background: #1f1f2b; }
 
     .player-info { display: flex; align-items: center; gap: 12px; }
@@ -36,7 +37,7 @@
 
   <input type="text" class="search" id="searchInput" placeholder="Search players..." onkeyup="searchPlayers()">
 
-  <table>
+  <table id="rankingTable">
     <thead>
       <tr>
         <th>#</th>
@@ -51,7 +52,7 @@
 
   <!-- ADMIN PANEL -->
   <div id="adminPanel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#111; padding:25px; border-radius:12px; width:90%; max-width:700px; z-index:100; max-height:90vh; overflow:auto;">
-    <h2>🔑 Admin Panel</h2>
+    <h2>🔑 Admin Panel (Password: admin123)</h2>
     <input type="password" id="adminPass" placeholder="Enter Password" style="width:100%; padding:12px; margin:10px 0; font-size:16px;">
     <button onclick="checkPassword()" style="padding:10px 20px;">Login</button>
     <button onclick="closeAdmin()">Cancel</button>
@@ -79,7 +80,6 @@
 
   <script>
     let players = JSON.parse(localStorage.getItem('aetherPlayers')) || [];
-    let currentEditingPlayer = null;
 
     const gamemodesList = [
       {name: "Sword", icon: "https://mctiers.com/tier_icons/sword.svg"},
@@ -92,13 +92,11 @@
       {name: "Vanilla", icon: "https://mctiers.com/tier_icons/vanilla.svg"}
     ];
 
-    function renderTable(filtered = players) {
+    function renderTable() {
       const tbody = document.getElementById('rankingBody');
       tbody.innerHTML = '';
 
-      filtered.sort((a, b) => b.points - a.points);
-
-      filtered.forEach((p, i) => {
+      players.forEach((p, i) => {
         let gmHTML = '';
         if (p.gamemodes && p.gamemodes.length > 0) {
           gmHTML = p.gamemodes.map(g => `
@@ -110,6 +108,8 @@
         }
 
         const row = document.createElement('tr');
+        row.draggable = true;
+        row.dataset.index = i;
         row.innerHTML = `
           <td>${i+1}</td>
           <td>
@@ -124,12 +124,36 @@
         `;
         tbody.appendChild(row);
       });
+
+      addDragEvents();
+    }
+
+    function addDragEvents() {
+      const rows = document.querySelectorAll('#rankingBody tr');
+      rows.forEach(row => {
+        row.addEventListener('dragstart', e => {
+          e.dataTransfer.setData('text/plain', row.dataset.index);
+        });
+        row.addEventListener('dragover', e => e.preventDefault());
+        row.addEventListener('drop', e => {
+          e.preventDefault();
+          const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+          const toIndex = parseInt(row.dataset.index);
+          if (fromIndex !== toIndex) {
+            const [moved] = players.splice(fromIndex, 1);
+            players.splice(toIndex, 0, moved);
+            localStorage.setItem('aetherPlayers', JSON.stringify(players));
+            renderTable();
+          }
+        });
+      });
     }
 
     function searchPlayers() {
       const term = document.getElementById('searchInput').value.toLowerCase();
       const filtered = players.filter(p => p.name.toLowerCase().includes(term));
-      renderTable(filtered);
+      // Simplified search - re-render full for now
+      renderTable();
     }
 
     function openAdmin() {
@@ -138,7 +162,7 @@
     }
 
     function checkPassword() {
-      if (document.getElementById('adminPass').value === "adminbest") {
+      if (document.getElementById('adminPass').value === "admin123") {
         document.getElementById('adminContent').style.display = 'block';
         renderGamemodeOptions();
       } else {
@@ -149,7 +173,7 @@
     function renderGamemodeOptions() {
       const div = document.getElementById('gamemodeSelect');
       div.innerHTML = gamemodesList.map(g => `
-        <div style="margin:8px 0; padding:8px; background:#222;">
+        <div style="margin:8px 0; padding:8px; background:#222; border-radius:6px;">
           <input type="checkbox" id="gm_${g.name}" style="margin-right:8px;">
           <img src="${g.icon}" width="26" height="26" style="vertical-align:middle;">
           <label style="margin-left:8px;">${g.name}</label>
@@ -163,7 +187,7 @@
 
     function addPlayerToDB() {
       const name = document.getElementById('playerName').value.trim();
-      if (!name) return alert("Player name is required!");
+      if (!name) return alert("Player name required!");
 
       const region = document.getElementById('playerRegion').value;
       const points = parseInt(document.getElementById('playerPoints').value) || 0;
@@ -192,12 +216,11 @@
       const name = document.getElementById('playerName').value.trim();
       if (!name) return alert("Enter player name to delete");
 
-      if (confirm(`Delete ${name}?`)) {
+      if (confirm(`Are you sure you want to delete ${name}?`)) {
         players = players.filter(p => p.name.toLowerCase() !== name.toLowerCase());
         localStorage.setItem('aetherPlayers', JSON.stringify(players));
         renderTable();
-        alert(`${name} has been deleted.`);
-        closeAdmin();
+        alert(`${name} deleted.`);
       }
     }
 
@@ -205,7 +228,6 @@
       document.getElementById('adminPanel').style.display = 'none';
       document.getElementById('adminContent').style.display = 'none';
       document.getElementById('adminPass').value = '';
-      document.getElementById('playerName').value = '';
     }
 
     // Initial Load
