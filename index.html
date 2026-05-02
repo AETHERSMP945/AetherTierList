@@ -52,7 +52,7 @@
 
   <!-- ADMIN PANEL -->
   <div id="adminPanel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#111; padding:25px; border-radius:12px; width:90%; max-width:700px; z-index:100; max-height:90vh; overflow:auto;">
-    <h2>🔑 Admin Panel (Password: admin123)</h2>
+    <h2>🔑 Admin Panel</h2>
     <input type="password" id="adminPass" placeholder="Enter Password" style="width:100%; padding:12px; margin:10px 0; font-size:16px;">
     <button onclick="checkPassword()" style="padding:10px 20px;">Login</button>
     <button onclick="closeAdmin()">Cancel</button>
@@ -125,23 +125,18 @@
         tbody.appendChild(row);
       });
 
-      addDragEvents();
-    }
-
-    function addDragEvents() {
-      const rows = document.querySelectorAll('#rankingBody tr');
+      // Drag and Drop
+      const rows = tbody.querySelectorAll('tr');
       rows.forEach(row => {
-        row.addEventListener('dragstart', e => {
-          e.dataTransfer.setData('text/plain', row.dataset.index);
-        });
+        row.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', row.dataset.index));
         row.addEventListener('dragover', e => e.preventDefault());
         row.addEventListener('drop', e => {
           e.preventDefault();
-          const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-          const toIndex = parseInt(row.dataset.index);
-          if (fromIndex !== toIndex) {
-            const [moved] = players.splice(fromIndex, 1);
-            players.splice(toIndex, 0, moved);
+          const from = parseInt(e.dataTransfer.getData('text/plain'));
+          const to = parseInt(row.dataset.index);
+          if (from !== to) {
+            const moved = players.splice(from, 1)[0];
+            players.splice(to, 0, moved);
             localStorage.setItem('aetherPlayers', JSON.stringify(players));
             renderTable();
           }
@@ -150,9 +145,6 @@
     }
 
     function searchPlayers() {
-      const term = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = players.filter(p => p.name.toLowerCase().includes(term));
-      // Simplified search - re-render full for now
       renderTable();
     }
 
@@ -200,12 +192,9 @@
         }
       });
 
-      const existingIndex = players.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
-      if (existingIndex !== -1) {
-        players[existingIndex] = { name, region, points, gamemodes };
-      } else {
-        players.push({ name, region, points, gamemodes });
-      }
+      const existing = players.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+      if (existing !== -1) players[existing] = { name, region, points, gamemodes };
+      else players.push({ name, region, points, gamemodes });
 
       localStorage.setItem('aetherPlayers', JSON.stringify(players));
       renderTable();
@@ -214,9 +203,8 @@
 
     function deleteCurrentPlayer() {
       const name = document.getElementById('playerName').value.trim();
-      if (!name) return alert("Enter player name to delete");
-
-      if (confirm(`Are you sure you want to delete ${name}?`)) {
+      if (!name) return alert("Enter player name");
+      if (confirm(`Delete ${name} permanently?`)) {
         players = players.filter(p => p.name.toLowerCase() !== name.toLowerCase());
         localStorage.setItem('aetherPlayers', JSON.stringify(players));
         renderTable();
@@ -230,7 +218,6 @@
       document.getElementById('adminPass').value = '';
     }
 
-    // Initial Load
     renderTable();
   </script>
 </body>
