@@ -474,7 +474,6 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo" id="logoBtn" title="Click to access admin panel">⬡ AETHER</div>
   <ul class="nav-links">
@@ -487,13 +486,11 @@
   </ul>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
   <h1>⬡ AETHER RANKINGS</h1>
   <p>COMPETITIVE PLAYER LEADERBOARD · OVERALL</p>
 </div>
 
-<!-- CATEGORIES -->
 <div class="categories">
   <button class="cat-btn active" onclick="filterCat('Overall')"><span class="cat-icon">🏆</span>Overall</button>
   <button class="cat-btn" onclick="filterCat('Vanilla')"><img class="cat-icon" src="https://mctiers.com/tier_icons/vanilla.svg" alt="Vanilla" />Vanilla</button>
@@ -506,7 +503,6 @@
   <button class="cat-btn" onclick="filterCat('Mace')"><img class="cat-icon" src="https://mctiers.com/tier_icons/mace.svg" alt="Mace" />Mace</button>
 </div>
 
-<!-- MAIN -->
 <main>
   <div class="stats-bar" id="statsBar"></div>
 
@@ -514,7 +510,6 @@
     <input class="search-input" id="searchInput" placeholder="🔍  Search player..." oninput="renderList()" />
   </div>
 
-  <!-- ADMIN PANEL -->
   <div id="adminPanel">
     <div class="admin-bar" style="flex-direction:column; gap:1rem;">
       <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end;">
@@ -631,7 +626,6 @@
   AETHER Rankings &nbsp;·&nbsp; <a href="https://discord.gg/y6qkqQKKhZ" target="_blank">Join our Discord</a> &nbsp;·&nbsp; Click the logo to access the admin panel
 </footer>
 
-<!-- LOGIN MODAL -->
 <div class="modal-overlay" id="loginModal">
   <div class="modal">
     <div class="modal-logo">⬡ AETHER</div>
@@ -645,18 +639,34 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+// ============================================================
+//  STEP 1: Replace the values below with YOUR Firebase config
+// ============================================================
+const firebaseConfig = {
+  apiKey:            "REPLACE_WITH_YOUR_apiKey",
+  authDomain:        "REPLACE_WITH_YOUR_authDomain",
+  databaseURL:       "REPLACE_WITH_YOUR_databaseURL",
+  projectId:         "REPLACE_WITH_YOUR_projectId",
+  storageBucket:     "REPLACE_WITH_YOUR_storageBucket",
+  messagingSenderId: "REPLACE_WITH_YOUR_messagingSenderId",
+  appId:             "REPLACE_WITH_YOUR_appId"
+};
+// ============================================================
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+const playersRef = ref(db, 'players');
+
 const TITLE_ICONS = {
   'Combat Grandmaster': '👑',
-  'Combat Master': '💎',
-  'Combat Ace': '🔷',
-  'Combat Veteran': '⭐',
-  'Combat Apprentice': '🔹',
-};
-
-const TIER_ICONS = {
-  HT1: '⚡', HT2: '⚡', HT3: '⚡',
-  LT1: '⚡', LT2: '⚡', LT3: '⚡',
+  'Combat Master':      '💎',
+  'Combat Ace':         '🔷',
+  'Combat Veteran':     '⭐',
+  'Combat Apprentice':  '🔹',
 };
 
 const GAMEMODES = ['Sword','Axe','Pot','Vanilla','UHC','NethOP','SMP','Mace'];
@@ -671,75 +681,65 @@ const GAMEMODE_SVG = {
   Mace:    'https://mctiers.com/tier_icons/mace.svg',
 };
 
-let players = [
-  { id:1, name:'Marlowww', points:450, region:'NA', title:'Combat Grandmaster', gameTiers:{ Sword:'HT1', Axe:'HT1', Pot:'LT1', Vanilla:'HT1', UHC:'HT1', NethOP:'LT1', SMP:'HT2' } },
-  { id:2, name:'ItzRealMe', points:330, region:'NA', title:'Combat Master', gameTiers:{ Sword:'HT3', Axe:'HT1', Pot:'HT1', Vanilla:'HT1', UHC:'LT2', NethOP:'LT2', SMP:'LT1' } },
-  { id:3, name:'coldified', points:326, region:'EU', title:'Combat Master', gameTiers:{ Sword:'LT1', Axe:'LT1', Pot:'LT3', Vanilla:'HT1', UHC:'HT1', NethOP:'LT1', SMP:'LT2' } },
-  { id:4, name:'Swight', points:290, region:'NA', title:'Combat Master', gameTiers:{ Sword:'HT3', Axe:'LT3', Pot:'LT3', Vanilla:'HT1', UHC:'HT1', NethOP:'HT2', SMP:'LT2' } },
-  { id:5, name:'janekv', points:245, region:'EU', title:'Combat Ace', gameTiers:{ Sword:'LT3', Axe:'HT1', Pot:'HT1', Vanilla:'LT1', UHC:'HT2', NethOP:'LT2', SMP:'LT2' } },
-  { id:6, name:'BlvckWlf', points:220, region:'EU', title:'Combat Ace', gameTiers:{ Sword:'HT1', Axe:'LT1', Pot:'HT1', Vanilla:'HT1', UHC:'LT2', NethOP:'LT3', SMP:'HT3' } },
-  { id:7, name:'Phantom', points:185, region:'AS', title:'Combat Veteran', gameTiers:{ Sword:'HT2', Axe:'LT2', Pot:'HT1', Vanilla:'LT1', UHC:'LT3', NethOP:'HT1', SMP:'LT1' } },
-  { id:8, name:'Nova_', points:140, region:'SA', title:'Combat Apprentice', gameTiers:{ Sword:'LT1', Axe:'LT2', Pot:'LT3', Vanilla:'HT3', UHC:'LT1', NethOP:'LT2', SMP:'LT3' } },
-];
-let nextId = 9;
-let adminOpen = false;
+let players    = [];
+let adminOpen  = false;
 let currentCat = 'Overall';
 
-function rankMedal(r) {
-  if (r===1) return '🥇';
-  if (r===2) return '🥈';
-  if (r===3) return '🥉';
-  return '';
-}
+onValue(playersRef, (snapshot) => {
+  players = [];
+  if (snapshot.exists()) {
+    snapshot.forEach(child => {
+      players.push({ firebaseKey: child.key, ...child.val() });
+    });
+  }
+  renderList();
+});
 
+function rankMedal(r) {
+  return r===1 ? '🥇' : r===2 ? '🥈' : r===3 ? '🥉' : '';
+}
 function rankClass(r) {
-  if (r===1) return 'top1';
-  if (r===2) return 'top2';
-  if (r===3) return 'top3';
-  return '';
+  return r===1 ? 'top1' : r===2 ? 'top2' : r===3 ? 'top3' : '';
 }
 
 function renderList() {
-  const query = document.getElementById('searchInput').value.toLowerCase();
-  let sorted = [...players].sort((a,b) => b.points - a.points);
+  const query  = document.getElementById('searchInput').value.toLowerCase();
+  let sorted   = [...players].sort((a,b) => b.points - a.points);
   if (query) sorted = sorted.filter(p => p.name.toLowerCase().includes(query));
 
   document.getElementById('playerList').innerHTML = sorted.map((p, i) => {
     const rank = i + 1;
-    const medal = rankMedal(rank);
-    const cls = rankClass(rank);
-    const ti = TITLE_ICONS[p.title] || '⭐';
+    const ti   = TITLE_ICONS[p.title] || '⭐';
 
-    // Show tiers: if a specific gamemode is selected, show only that one big; else show all
     let tBadges = '';
     if (currentCat !== 'Overall' && GAMEMODES.includes(currentCat)) {
-      const t = p.gameTiers[currentCat];
+      const t      = p.gameTiers ? p.gameTiers[currentCat] : null;
       const svgSrc = GAMEMODE_SVG[currentCat] || '';
-      if (t) {
-        tBadges = `<div class="tier-badge tier-${t}" style="width:48px;height:48px;gap:2px;">
-          <img src="${svgSrc}" style="width:20px;height:20px;object-fit:contain;" alt="${currentCat}" />
-          <span class="tb-label" style="font-size:0.6rem;">${t}</span>
-        </div>`;
-      } else {
-        tBadges = `<span style="font-size:0.75rem;color:var(--muted);">—</span>`;
-      }
+      tBadges = t
+        ? `<div class="tier-badge tier-${t}" style="width:48px;height:48px;gap:2px;">
+             <img src="${svgSrc}" style="width:20px;height:20px;object-fit:contain;" alt="${currentCat}" />
+             <span class="tb-label" style="font-size:0.6rem;">${t}</span>
+           </div>`
+        : `<span style="font-size:0.75rem;color:var(--muted);">—</span>`;
     } else {
       tBadges = GAMEMODES.map(gm => {
-        const t = p.gameTiers[gm];
+        const t = p.gameTiers ? p.gameTiers[gm] : null;
         if (!t) return '';
-        const svgSrc = GAMEMODE_SVG[gm] || '';
         return `<div class="tier-badge tier-${t}" title="${gm}: ${t}">
-          <img src="${svgSrc}" style="width:14px;height:14px;object-fit:contain;" alt="${gm}" />
+          <img src="${GAMEMODE_SVG[gm]}" style="width:14px;height:14px;object-fit:contain;" alt="${gm}" />
           <span class="tb-label">${t}</span>
         </div>`;
       }).join('');
     }
 
-    const removeBtn = adminOpen ? `<button class="btn-remove" onclick="removePlayer(${p.id});event.stopPropagation()">✕</button>` : '';
+    const removeBtn = adminOpen
+      ? `<button class="btn-remove" onclick="window.removePlayer('${p.firebaseKey}');event.stopPropagation()">✕</button>`
+      : '';
+
     return `
-      <div class="player-row ${cls}">
+      <div class="player-row ${rankClass(rank)}">
         <div class="rank-cell rank-${rank <= 3 ? rank : 'other'}">
-          ${medal ? `<span class="rank-medal">${medal}</span>` : rank + '.'}
+          ${rankMedal(rank) ? `<span class="rank-medal">${rankMedal(rank)}</span>` : rank + '.'}
         </div>
         <div class="player-info">
           <div class="avatar">${p.name.slice(0,2).toUpperCase()}</div>
@@ -755,10 +755,9 @@ function renderList() {
       </div>`;
   }).join('');
 
-  // Stats bar
   const total = players.length;
-  const top = players.reduce((a,b) => b.points > a.points ? b : a, players[0]);
-  const avg = Math.round(players.reduce((s,p) => s+p.points, 0) / total);
+  const top   = total ? players.reduce((a,b) => b.points > a.points ? b : a) : null;
+  const avg   = total ? Math.round(players.reduce((s,p) => s+p.points, 0) / total) : 0;
   document.getElementById('statsBar').innerHTML = `
     <div class="stat-chip"><span>${total}</span>Players</div>
     <div class="stat-chip"><span>${top ? top.name : '–'}</span>Top Player</div>
@@ -767,50 +766,53 @@ function renderList() {
   `;
 }
 
-function filterCat(cat) {
-  currentCat = cat;
-  document.querySelectorAll('.cat-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.includes(cat));
-  });
-  renderList();
-}
-
-function addPlayer() {
-  const name = document.getElementById('newName').value.trim();
+window.addPlayer = function() {
+  const name   = document.getElementById('newName').value.trim();
   const points = parseInt(document.getElementById('newPoints').value) || 0;
   const region = document.getElementById('newRegion').value;
-  const title = document.getElementById('newTitle').value;
+  const title  = document.getElementById('newTitle').value;
   if (!name) return;
   const gameTiers = {};
   GAMEMODES.forEach(gm => {
     const val = document.getElementById('tier_' + gm).value;
     if (val) gameTiers[gm] = val;
   });
-  players.push({ id: nextId++, name, points, region, title, gameTiers });
-  document.getElementById('newName').value = '';
+  push(playersRef, { name, points, region, title, gameTiers });
+  document.getElementById('newName').value  = '';
   document.getElementById('newPoints').value = '';
   GAMEMODES.forEach(gm => document.getElementById('tier_' + gm).value = '');
-  renderList();
-}
+};
 
-function removePlayer(id) {
-  players = players.filter(p => p.id !== id);
+window.removePlayer = function(firebaseKey) {
+  remove(ref(db, 'players/' + firebaseKey));
+};
+
+window.filterCat = function(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim().includes(cat));
+  });
   renderList();
-}
+};
 
 document.getElementById('logoBtn').addEventListener('click', () => {
-  if (adminOpen) { adminOpen = false; document.getElementById('adminPanel').style.display = 'none'; return; }
+  if (adminOpen) {
+    adminOpen = false;
+    document.getElementById('adminPanel').style.display = 'none';
+    renderList();
+    return;
+  }
   document.getElementById('loginModal').classList.add('open');
   setTimeout(() => document.getElementById('pwInput').focus(), 80);
 });
 
-function closeModal() {
+window.closeModal = function() {
   document.getElementById('loginModal').classList.remove('open');
   document.getElementById('pwInput').value = '';
   document.getElementById('loginErr').style.display = 'none';
-}
+};
 
-function doLogin() {
+window.doLogin = function() {
   if (document.getElementById('pwInput').value === 'admin123') {
     closeModal();
     adminOpen = true;
@@ -820,13 +822,11 @@ function doLogin() {
     document.getElementById('loginErr').style.display = 'block';
     document.getElementById('pwInput').value = '';
   }
-}
+};
 
 document.getElementById('loginModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
-
-renderList();
 </script>
 </body>
 </html>
