@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AetherSMP Tier List</title>
+</head>
+<body>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getDatabase, ref, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+    // ============================================================
+    // Firebase тохиргоо
+    // ============================================================
+    const firebaseConfig = {
+      apiKey:            "AIzaSyDtyl8ocwj2QG71DiaYYgoshUUe_RIrwF0",
+      authDomain:        "aethersmptierlist.firebaseapp.com",
+      databaseURL:       "https://aethersmptierlist-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId:         "aethersmptierlist",
+      storageBucket:     "aethersmptierlist.appspot.com",
+      messagingSenderId: "334464990485",
+      appId:             "1:334464990485:web:e4cbe9019a13f33309fd1c",
+      measurementId:     "G-SZ3MJ220HW"
+    };
+    // ============================================================
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+    const playersRef = ref(db, 'players');
+
+    const TITLE_ICONS = {
+      'Combat Grandmaster': '👑',
+      'Combat Master':      '💎',
+      'Combat Ace':         '🔷',
+      'Combat Veteran':     '⭐',
+      'Combat Apprentice':  '🔹',
+    };
+
+    const GAMEMODES = ['Sword','Axe','Pot','Vanilla','UHC','NethOP','SMP','Mace'];
+    const GAMEMODE_SVG = {
+      Sword:   'https://mctiers.com/tier_icons/sword.svg',
+      Axe:     'https://mctiers.com/tier_icons/axe.svg',
+      Pot:     'https://mctiers.com/tier_icons/pot.svg',
+      Vanilla: 'https://mctiers.com/tier_icons/vanilla.svg',
+      UHC:     'https://mctiers.com/tier_icons/uhc.svg',
+      NethOP:  'https://mctiers.com/tier_icons/nethop.svg',
+      SMP:     'https://mctiers.com/tier_icons/smp.svg',
+      Mace:    'https://mctiers.com/tier_icons/mace.svg',
+    };
+
+    let players    = [];
+    let adminOpen  = false;
+    let currentCat = 'Overall';
+
+    // ── Listen for real-time changes from Firebase ──────────────
+    onValue(playersRef, (snapshot) => {
+      players = [];
+      if (snapshot.exists()) {
+        snapshot.forEach(child => {
+          players.push({ firebaseKey: child.key, ...child.val() });
+        });
+      }
+      renderList();
+    });
+
+    // ── Rendering ───────────────────────────────────────────────
+    function rankMedal(r) {
+      return r===1 ? '🥇' : r===2 ? '🥈' : r===3 ? '🥉' : '';
+    }
+    
+    function rankClass(r) {
+      return r===1 ? 'top1' : r===2 ? 'top2' : r===3 ? 'top3' : '';
+    }
+
+    function renderList() {
+      const query  = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
+      let sorted   = [...players].sort((a,b) => b.points - a.points);
+      
+      if (query) sorted = sorted.filter(p => p.name.toLowerCase().includes(query));
+      
+      const playerListEl = document.getElementById('playerList');
+      if (playerListEl) {
+        playerListEl.innerHTML = sorted.map((p, i) => {
+          const rank = i + 1;
+          const ti   = TITLE_ICONS[p.title] || '⭐';
+
+          let tBadges = '';
+          if (currentCat !== 'Overall' && GAMEMODES.includes(currentCat)) {
+            const t      = p.gameTiers ? p.gameTiers[currentCat] : null;
+            const svgSrc = GAMEMODE_SVG[currentCat] || '';
+            tBadges = t
+              ? `<div class="tier-badge tier-${t}" style="width:48px;height:48px;gap:2px;">
+                   <img src="${svgSrc}" style="width:20px;height:20px;object-fit:contain;" alt="${currentCat}" />
+                   <span class="tb-label" style="font-size:0.6rem;">${t}</span>
+                 </div>`
+              : `<span style="font-size:0.75rem;color:var(--muted);">—</span>`;
+          } else {
+            tBadges = GAMEMODES.map(gm => {
+              const t = p.gameTiers ? p.gameTiers[gm] : null;
+              if (!t) return '';
+              return `<div class="tier-badge tier-${t}" title="${gm}: ${t}">
+                        <img src="${GAMEMODE_SVG[gm]}" style="width:14px;height:14px;object-fit:contain;" alt="${gm}" />
+                        <span class="tb-label">${t}</span>
+                      </div>`;
+            }).join('');
+          }
+
+          const removeBtn = adminOpen
+            ? `<button class="btn-remove" onclick="window.removePlayer('${p.firebaseKey}');event.stopPropagation()">✕</button>`
+            : '';
+
+          return `
+            <div class="player-row ${rankClass(rank)}">
+              <div class="rank-cell rank-${rank <= 3 ? rank : 'other'}">
+                ${rankMedal(rank) ? `<span class="rank-medal">${rankMedal(rank)}</span>` : rank + '.'}
+              </div>
+              <div class="player-info">
+                <div class="avatar">${p.name.slice(0,2).toUpperCase()}</div>
+                <div class="player-name-wrap">
+                  <div class="player-name">${p.name}</div>
+                  <div class="player-title"><span class="title-icon">${ti}</span>${p.title}</div>
+                </div>
+                ${removeBtn}
+              </div>
+              <div><span class="region-badge region-${p.region}">${p.region}</span></div>
+              <div class="tiers-cell">${tBadges}</div>
+              <div class="points-cell">${p.points.toLocaleString()} pts</div>
+            </div>`;
+        }).join('');
+      }
+
+      const total = players.length;
+      const top   = total ? players.reduce((a,b) => b.points > a.points ? b : a) : null;
+      const avg   = total ? Math.round(players.reduce((s,p) => s+p.points, 0) / total) : 0;
+      
+      const statsBarEl = document.getElementById('statsBar');
+      if (statsBarEl) {
+        statsBarEl.innerHTML = `
+          <div class="stat-chip"><span>${total}</span>Players</div>
+          <div class="stat-chip"><span>${top ? top.name : '–'}</span>Top Player</div>
+          <div class="stat-chip"><span>${avg}</span>Avg Points</div>
+          <div class="stat-chip"><span>${currentCat}</span>Category</div>
+        `;
+      }
+    }
+
+    // ── Add player ──────────────────────────────────────────────
+    window.addPlayer = function() {
+      const name   = document.getElementById('newName').value.trim();
+      const points = parseInt(document.getElementById('newPoints').value) || 0;
+      const region = document.getElementById('newRegion').value;
+      const title  = document.getElementById('newTitle').value;
+      if (!name) return;
+      const gameTiers = {};
+      GAMEMODES.forEach(gm => {
+        const val = document.getElementById('tier_' + gm).value;
+        if (val) gameTiers[gm] = val;
+      });
+      push(playersRef, { name, points, region, title, gameTiers });
+      document.getElementById('newName').value  = '';
+      document.getElementById('newPoints').value = '';
+      GAMEMODES.forEach(gm => document.getElementById('tier_' + gm).value = '');
+    };
+
+    // ── Remove player ───────────────────────────────────────────
+    window.removePlayer = function(firebaseKey) {
+      remove(ref(db, 'players/' + firebaseKey));
+    };
+
+    // ── Category filter ──────────────────────────────────────────
+    window.filterCat = function(cat) {
+      currentCat = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent.trim().includes(cat));
+      });
+      renderList();
+    };
+
+    // ── Admin login ──────────────────────────────────────────────
+    document.getElementById('logoBtn').addEventListener('click', () => {
+      if (adminOpen) {
+        adminOpen = false;
+        document.getElementById('adminPanel').style.display = 'none';
+        renderList();
+        return;
+      }
+      document.getElementById('loginModal').classList.add('open');
+      setTimeout(() => document.getElementById('pwInput').focus(), 80);
+    });
+    
+    window.closeModal = function() {
+      document.getElementById('loginModal').classList.remove('open');
+      document.getElementById('pwInput').value = '';
+      document.getElementById('loginErr').style.display = 'none';
+    };
+    
+    window.doLogin = function() {
+      if (document.getElementById('pwInput').value === 'admin123') {
+        closeModal();
+        adminOpen = true;
+        document.getElementById('adminPanel').style.display = 'block';
+        renderList();
+      } else {
+        document.getElementById('loginErr').style.display = 'block';
+        document.getElementById('pwInput').value = '';
+      }
+    };
+    
+    document.getElementById('loginModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  </script>
+</body>
+</html>
