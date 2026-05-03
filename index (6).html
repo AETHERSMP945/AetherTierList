@@ -34,7 +34,6 @@
     overflow-x: hidden;
   }
 
-  /* BG grid lines */
   body::before {
     content: '';
     position: fixed;
@@ -47,7 +46,6 @@
     z-index: 0;
   }
 
-  /* NAV */
   nav {
     position: sticky; top: 0; z-index: 100;
     background: rgba(13,14,20,0.92);
@@ -101,7 +99,6 @@
   }
   .discord-link:hover { opacity: 0.85; color: #fff !important; }
 
-  /* HERO */
   .hero {
     position: relative; z-index: 1;
     text-align: center;
@@ -126,7 +123,6 @@
     letter-spacing: 0.05em;
   }
 
-  /* CATEGORY TABS */
   .categories {
     position: relative; z-index: 1;
     display: flex; align-items: center; justify-content: center;
@@ -158,7 +154,6 @@
   }
   .cat-icon { font-size: 1.2rem; width: 22px; height: 22px; object-fit: contain; }
 
-  /* MAIN CONTENT */
   main {
     position: relative; z-index: 1;
     max-width: 960px;
@@ -166,7 +161,6 @@
     padding: 1.5rem 1.5rem 4rem;
   }
 
-  /* TABLE HEADER */
   .table-header {
     display: grid;
     grid-template-columns: 60px 1fr 90px 130px 90px;
@@ -180,7 +174,6 @@
     margin-bottom: 0.5rem;
   }
 
-  /* PLAYER ROW */
   .player-row {
     display: grid;
     grid-template-columns: 60px 1fr 90px 130px 90px;
@@ -201,21 +194,11 @@
     transform: translateX(3px);
   }
 
-  .player-row:nth-child(1) { animation-delay: 0.05s; }
-  .player-row:nth-child(2) { animation-delay: 0.1s; }
-  .player-row:nth-child(3) { animation-delay: 0.15s; }
-  .player-row:nth-child(4) { animation-delay: 0.2s; }
-  .player-row:nth-child(5) { animation-delay: 0.25s; }
-  .player-row:nth-child(6) { animation-delay: 0.3s; }
-  .player-row:nth-child(7) { animation-delay: 0.35s; }
-  .player-row:nth-child(8) { animation-delay: 0.4s; }
-
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Rank */
   .rank-cell {
     font-family: 'Rajdhani', sans-serif;
     font-size: 1.25rem;
@@ -226,13 +209,9 @@
   .rank-1 { color: var(--gold); }
   .rank-2 { color: var(--silver); }
   .rank-3 { color: var(--bronze); }
-
   .rank-medal { font-size: 1rem; }
 
-  /* Player info */
-  .player-info {
-    display: flex; align-items: center; gap: 12px;
-  }
+  .player-info { display: flex; align-items: center; gap: 12px; }
 
   .avatar {
     width: 42px; height: 42px;
@@ -245,14 +224,7 @@
     flex-shrink: 0;
   }
 
-  .avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-  .player-name-wrap {}
-  .player-name {
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 0.01em;
-  }
+  .player-name { font-weight: 600; font-size: 0.95rem; letter-spacing: 0.01em; }
 
   .player-title {
     font-size: 0.72rem;
@@ -263,7 +235,6 @@
 
   .title-icon { font-size: 0.8rem; }
 
-  /* Region badge */
   .region-badge {
     display: inline-flex; align-items: center; justify-content: center;
     padding: 3px 10px;
@@ -277,10 +248,7 @@
   .region-AS { background: rgba(251,146,60,0.1); color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
   .region-SA { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
 
-  /* Tiers display */
-  .tiers-cell {
-    display: flex; flex-wrap: wrap; gap: 4px;
-  }
+  .tiers-cell { display: flex; flex-wrap: wrap; gap: 4px; }
 
   .tier-badge {
     display: inline-flex; align-items: center; justify-content: center;
@@ -293,7 +261,6 @@
     flex-direction: column;
     gap: 1px;
   }
-  .tier-badge .tb-icon { font-size: 0.8rem; }
   .tier-badge .tb-label { font-size: 0.5rem; letter-spacing: 0.05em; }
 
   .tier-HT1 { background: rgba(245,197,66,0.15);  color: #f5c542; border-color: rgba(245,197,66,0.4); }
@@ -307,7 +274,6 @@
   .tier-LT4 { background: rgba(148,163,184,0.1);  color: #94a3b8; border-color: rgba(148,163,184,0.25); }
   .tier-LT5 { background: rgba(100,116,139,0.08); color: #64748b; border-color: rgba(100,116,139,0.2); }
 
-  /* Points */
   .points-cell {
     font-family: 'Rajdhani', sans-serif;
     font-size: 1.05rem;
@@ -316,12 +282,10 @@
     text-align: right;
   }
 
-  /* TOP 3 special */
   .player-row.top1 { border-color: rgba(245,197,66,0.35); background: rgba(245,197,66,0.04); }
   .player-row.top2 { border-color: rgba(192,199,212,0.3); background: rgba(192,199,212,0.03); }
   .player-row.top3 { border-color: rgba(205,127,74,0.3); background: rgba(205,127,74,0.03); }
 
-  /* ADMIN MODAL */
   .modal-overlay {
     position: fixed; inset: 0; z-index: 999;
     background: rgba(0,0,0,0.75);
@@ -386,7 +350,6 @@
     cursor: pointer; font-family: 'Inter', sans-serif;
   }
 
-  /* ADMIN PANEL */
   #adminPanel { display: none; }
 
   .admin-bar {
@@ -429,10 +392,7 @@
     cursor: pointer;
   }
 
-  /* SEARCH */
-  .search-row {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;
-  }
+  .search-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
   .search-input {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -447,9 +407,7 @@
   }
   .search-input:focus { border-color: var(--accent); }
 
-  .stats-bar {
-    display: flex; gap: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;
-  }
+  .stats-bar { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
   .stat-chip {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -474,7 +432,6 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <div class="nav-logo" id="logoBtn" title="Click to access admin panel">⬡ AETHER</div>
   <ul class="nav-links">
@@ -487,40 +444,35 @@
   </ul>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
   <h1>⬡ AETHER RANKINGS</h1>
   <p>COMPETITIVE PLAYER LEADERBOARD · OVERALL</p>
 </div>
 
-<!-- CATEGORIES -->
 <div class="categories">
-  <button class="cat-btn active" onclick="filterCat('Overall')"><span class="cat-icon">🏆</span>Overall</button>
-  <button class="cat-btn" onclick="filterCat('Vanilla')"><img class="cat-icon" src="https://mctiers.com/tier_icons/vanilla.svg" alt="Vanilla" />Vanilla</button>
-  <button class="cat-btn" onclick="filterCat('UHC')"><img class="cat-icon" src="https://mctiers.com/tier_icons/uhc.svg" alt="UHC" />UHC</button>
-  <button class="cat-btn" onclick="filterCat('Pot')"><img class="cat-icon" src="https://mctiers.com/tier_icons/pot.svg" alt="Pot" />DiaPot</button>
-  <button class="cat-btn" onclick="filterCat('NethOP')"><img class="cat-icon" src="https://mctiers.com/tier_icons/nethop.svg" alt="NethOP" />NethOP</button>
-  <button class="cat-btn" onclick="filterCat('SMP')"><img class="cat-icon" src="https://mctiers.com/tier_icons/smp.svg" alt="SMP" />SMP</button>
-  <button class="cat-btn" onclick="filterCat('Sword')"><img class="cat-icon" src="https://mctiers.com/tier_icons/sword.svg" alt="Sword" />Sword</button>
-  <button class="cat-btn" onclick="filterCat('Axe')"><img class="cat-icon" src="https://mctiers.com/tier_icons/axe.svg" alt="Axe" />Axe</button>
-  <button class="cat-btn" onclick="filterCat('Mace')"><img class="cat-icon" src="https://mctiers.com/tier_icons/mace.svg" alt="Mace" />Mace</button>
+  <button class="cat-btn active" onclick="window.filterCat('Overall')"><span class="cat-icon">🏆</span>Overall</button>
+  <button class="cat-btn" onclick="window.filterCat('Vanilla')"><img class="cat-icon" src="https://mctiers.com/tier_icons/vanilla.svg" alt="Vanilla" />Vanilla</button>
+  <button class="cat-btn" onclick="window.filterCat('UHC')"><img class="cat-icon" src="https://mctiers.com/tier_icons/uhc.svg" alt="UHC" />UHC</button>
+  <button class="cat-btn" onclick="window.filterCat('Pot')"><img class="cat-icon" src="https://mctiers.com/tier_icons/pot.svg" alt="Pot" />DiaPot</button>
+  <button class="cat-btn" onclick="window.filterCat('NethOP')"><img class="cat-icon" src="https://mctiers.com/tier_icons/nethop.svg" alt="NethOP" />NethOP</button>
+  <button class="cat-btn" onclick="window.filterCat('SMP')"><img class="cat-icon" src="https://mctiers.com/tier_icons/smp.svg" alt="SMP" />SMP</button>
+  <button class="cat-btn" onclick="window.filterCat('Sword')"><img class="cat-icon" src="https://mctiers.com/tier_icons/sword.svg" alt="Sword" />Sword</button>
+  <button class="cat-btn" onclick="window.filterCat('Axe')"><img class="cat-icon" src="https://mctiers.com/tier_icons/axe.svg" alt="Axe" />Axe</button>
+  <button class="cat-btn" onclick="window.filterCat('Mace')"><img class="cat-icon" src="https://mctiers.com/tier_icons/mace.svg" alt="Mace" />Mace</button>
 </div>
 
-<!-- MAIN -->
 <main>
   <div class="stats-bar" id="statsBar"></div>
-
   <div class="search-row">
-    <input class="search-input" id="searchInput" placeholder="🔍  Search player..." oninput="renderList()" />
+    <input class="search-input" id="searchInput" placeholder="🔍  Search player..." oninput="window.renderList && window.renderList()" />
   </div>
 
-  <!-- ADMIN PANEL -->
   <div id="adminPanel">
     <div class="admin-bar" style="flex-direction:column; gap:1rem;">
       <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end;">
         <div>
           <label>Player name</label>
-          <input type="text" id="newName" placeholder="Marlowww" />
+          <input type="text" id="newName" placeholder="PlayerName" />
         </div>
         <div>
           <label>Points</label>
@@ -534,314 +486,4 @@
         </div>
         <div>
           <label>Title</label>
-          <select id="newTitle">
-            <option>Combat Grandmaster</option>
-            <option>Combat Master</option>
-            <option>Combat Ace</option>
-            <option>Combat Veteran</option>
-            <option>Combat Apprentice</option>
-          </select>
-        </div>
-      </div>
-      <div style="border-top:1px solid var(--border); padding-top:0.85rem;">
-        <div style="font-size:0.7rem; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.65rem;">Tier per gamemode</div>
-        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;">
-          <div>
-            <label><img src="https://mctiers.com/tier_icons/sword.svg" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" alt="">Sword</label>
-            <select id="tier_Sword" class="tier-sel">
-              <option value="">—</option>
-              <option>HT1</option><option>HT2</option><option>HT3</option><option>HT4</option><option>HT5</option>
-              <option>LT1</option><option>LT2</option><option>LT3</option><option>LT4</option><option>LT5</option>
-            </select>
-          </div>
-          <div>
-            <label><img src="https://mctiers.com/tier_icons/axe.svg" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" alt="">Axe</label>
-            <select id="tier_Axe" class="tier-sel">
-              <option value="">—</option>
-              <option>HT1</option><option>HT2</option><option>HT3</option><option>HT4</option><option>HT5</option>
-              <option>LT1</option><option>LT2</option><option>LT3</option><option>LT4</option><option>LT5</option>
-            </select>
-          </div>
-          <div>
-            <label><img src="https://mctiers.com/tier_icons/pot.svg" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" alt="">DiaPot</label>
-            <select id="tier_Pot" class="tier-sel">
-              <option value="">—</option>
-              <option>HT1</option><option>HT2</option><option>HT3</option><option>HT4</option><option>HT5</option>
-              <option>LT1</option><option>LT2</option><option>LT3</option><option>LT4</option><option>LT5</option>
-            </select>
-          </div>
-          <div>
-            <label><img src="https://mctiers.com/tier_icons/vanilla.svg" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" alt="">Vanilla</label>
-            <select id="tier_Vanilla" class="tier-sel">
-              <option value="">—</option>
-              <option>HT1</option><option>HT2</option><option>HT3</option><option>HT4</option><option>HT5</option>
-              <option>LT1</option><option>LT2</option><option>LT3</option><option>LT4</option><option>LT5</option>
-            </select>
-          </div>
-          <div>
-            <label><img src="https://mctiers.com/tier_icons/uhc.svg" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" alt="">UHC</label>
-            <select id="tier_UHC" class="tier-sel">
-              <option value="">—</option>
-              <option>HT1</option><option>HT2</option><option>HT3</option><option>HT4</option><option>HT5</option>
-              <option>LT1</option><option>LT2</option><option>LT3</option><option>LT4</option><option>LT5</option>
-            </select>
-          </div>
-          <div>
-            <label><img src="https://mctiers.com/tier_icons/nethop.svg" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" alt="">NethOP</label>
-            <select id="tier_NethOP" class="tier-sel">
-              <option value="">—</option>
-              <option>HT1</option><option>HT2</option><option>HT3</option><option>HT4</option><option>HT5</option>
-              <option>LT1</option><option>LT2</option><option>LT3</option><option>LT4</option><option>LT5</option>
-            </select>
-          </div>
-          <div>
-            <label><img src="https://mctiers.com/tier_icons/smp.svg" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" alt="">SMP</label>
-            <select id="tier_SMP" class="tier-sel">
-              <option value="">—</option>
-              <option>HT1</option><option>HT2</option><option>HT3</option><option>HT4</option><option>HT5</option>
-              <option>LT1</option><option>LT2</option><option>LT3</option><option>LT4</option><option>LT5</option>
-            </select>
-          </div>
-          <div>
-            <label><img src="https://mctiers.com/tier_icons/mace.svg" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;" alt="">Mace</label>
-            <select id="tier_Mace" class="tier-sel">
-              <option value="">—</option>
-              <option>HT1</option><option>HT2</option><option>HT3</option><option>HT4</option><option>HT5</option>
-              <option>LT1</option><option>LT2</option><option>LT3</option><option>LT4</option><option>LT5</option>
-            </select>
-          </div>
-          <button class="btn-add-player" onclick="addPlayer()" style="align-self:flex-end;">+ Add Player</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="table-header">
-    <div>#</div>
-    <div>Player</div>
-    <div>Region</div>
-    <div>Tiers</div>
-    <div style="text-align:right">Points</div>
-  </div>
-
-  <div id="playerList"></div>
-</main>
-
-<footer>
-  AETHER Rankings &nbsp;·&nbsp; <a href="https://discord.gg/y6qkqQKKhZ" target="_blank">Join our Discord</a> &nbsp;·&nbsp; Click the logo to access the admin panel
-</footer>
-
-<!-- LOGIN MODAL -->
-<div class="modal-overlay" id="loginModal">
-  <div class="modal">
-    <div class="modal-logo">⬡ AETHER</div>
-    <p>Admin access required. Enter your password.</p>
-    <div class="modal-err" id="loginErr">Incorrect password. Try again.</div>
-    <input type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()" />
-    <div class="modal-btns">
-      <button class="btn-cancel-modal" onclick="closeModal()">Cancel</button>
-      <button class="btn-login" onclick="doLogin()">Unlock</button>
-    </div>
-  </div>
-</div>
-
-<!-- Firebase SDK -->
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
-
-// ============================================================
-//  STEP 1: Replace the values below with YOUR Firebase config
-//  Go to: console.firebase.google.com → Your project →
-//  Project Settings → Your apps → Web app → Config
-// ============================================================
-const firebaseConfig = {
-  apiKey:            "REPLACE_WITH_YOUR_apiKey",
-  authDomain:        "REPLACE_WITH_YOUR_authDomain",
-  databaseURL:       "REPLACE_WITH_YOUR_databaseURL",
-  projectId:         "REPLACE_WITH_YOUR_projectId",
-  storageBucket:     "REPLACE_WITH_YOUR_storageBucket",
-  messagingSenderId: "REPLACE_WITH_YOUR_messagingSenderId",
-  appId:             "REPLACE_WITH_YOUR_appId"
-};
-// ============================================================
-
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
-const playersRef = ref(db, 'players');
-
-const TITLE_ICONS = {
-  'Combat Grandmaster': '👑',
-  'Combat Master':      '💎',
-  'Combat Ace':         '🔷',
-  'Combat Veteran':     '⭐',
-  'Combat Apprentice':  '🔹',
-};
-
-const GAMEMODES = ['Sword','Axe','Pot','Vanilla','UHC','NethOP','SMP','Mace'];
-const GAMEMODE_SVG = {
-  Sword:   'https://mctiers.com/tier_icons/sword.svg',
-  Axe:     'https://mctiers.com/tier_icons/axe.svg',
-  Pot:     'https://mctiers.com/tier_icons/pot.svg',
-  Vanilla: 'https://mctiers.com/tier_icons/vanilla.svg',
-  UHC:     'https://mctiers.com/tier_icons/uhc.svg',
-  NethOP:  'https://mctiers.com/tier_icons/nethop.svg',
-  SMP:     'https://mctiers.com/tier_icons/smp.svg',
-  Mace:    'https://mctiers.com/tier_icons/mace.svg',
-};
-
-let players    = [];   // live array synced from Firebase
-let adminOpen  = false;
-let currentCat = 'Overall';
-
-// ── Listen for real-time changes from Firebase ──────────────
-onValue(playersRef, (snapshot) => {
-  players = [];
-  if (snapshot.exists()) {
-    snapshot.forEach(child => {
-      players.push({ firebaseKey: child.key, ...child.val() });
-    });
-  }
-  renderList();
-});
-
-// ── Rendering ───────────────────────────────────────────────
-function rankMedal(r) {
-  return r===1 ? '🥇' : r===2 ? '🥈' : r===3 ? '🥉' : '';
-}
-function rankClass(r) {
-  return r===1 ? 'top1' : r===2 ? 'top2' : r===3 ? 'top3' : '';
-}
-
-function renderList() {
-  const query  = document.getElementById('searchInput').value.toLowerCase();
-  let sorted   = [...players].sort((a,b) => b.points - a.points);
-  if (query) sorted = sorted.filter(p => p.name.toLowerCase().includes(query));
-
-  document.getElementById('playerList').innerHTML = sorted.map((p, i) => {
-    const rank = i + 1;
-    const ti   = TITLE_ICONS[p.title] || '⭐';
-
-    let tBadges = '';
-    if (currentCat !== 'Overall' && GAMEMODES.includes(currentCat)) {
-      const t      = p.gameTiers ? p.gameTiers[currentCat] : null;
-      const svgSrc = GAMEMODE_SVG[currentCat] || '';
-      tBadges = t
-        ? `<div class="tier-badge tier-${t}" style="width:48px;height:48px;gap:2px;">
-             <img src="${svgSrc}" style="width:20px;height:20px;object-fit:contain;" alt="${currentCat}" />
-             <span class="tb-label" style="font-size:0.6rem;">${t}</span>
-           </div>`
-        : `<span style="font-size:0.75rem;color:var(--muted);">—</span>`;
-    } else {
-      tBadges = GAMEMODES.map(gm => {
-        const t = p.gameTiers ? p.gameTiers[gm] : null;
-        if (!t) return '';
-        return `<div class="tier-badge tier-${t}" title="${gm}: ${t}">
-          <img src="${GAMEMODE_SVG[gm]}" style="width:14px;height:14px;object-fit:contain;" alt="${gm}" />
-          <span class="tb-label">${t}</span>
-        </div>`;
-      }).join('');
-    }
-
-    const removeBtn = adminOpen
-      ? `<button class="btn-remove" onclick="window.removePlayer('${p.firebaseKey}');event.stopPropagation()">✕</button>`
-      : '';
-
-    return `
-      <div class="player-row ${rankClass(rank)}">
-        <div class="rank-cell rank-${rank <= 3 ? rank : 'other'}">
-          ${rankMedal(rank) ? `<span class="rank-medal">${rankMedal(rank)}</span>` : rank + '.'}
-        </div>
-        <div class="player-info">
-          <div class="avatar">${p.name.slice(0,2).toUpperCase()}</div>
-          <div class="player-name-wrap">
-            <div class="player-name">${p.name}</div>
-            <div class="player-title"><span class="title-icon">${ti}</span>${p.title}</div>
-          </div>
-          ${removeBtn}
-        </div>
-        <div><span class="region-badge region-${p.region}">${p.region}</span></div>
-        <div class="tiers-cell">${tBadges}</div>
-        <div class="points-cell">${p.points.toLocaleString()} pts</div>
-      </div>`;
-  }).join('');
-
-  const total = players.length;
-  const top   = total ? players.reduce((a,b) => b.points > a.points ? b : a) : null;
-  const avg   = total ? Math.round(players.reduce((s,p) => s+p.points, 0) / total) : 0;
-  document.getElementById('statsBar').innerHTML = `
-    <div class="stat-chip"><span>${total}</span>Players</div>
-    <div class="stat-chip"><span>${top ? top.name : '–'}</span>Top Player</div>
-    <div class="stat-chip"><span>${avg}</span>Avg Points</div>
-    <div class="stat-chip"><span>${currentCat}</span>Category</div>
-  `;
-}
-
-// ── Add player → saved to Firebase ──────────────────────────
-window.addPlayer = function() {
-  const name   = document.getElementById('newName').value.trim();
-  const points = parseInt(document.getElementById('newPoints').value) || 0;
-  const region = document.getElementById('newRegion').value;
-  const title  = document.getElementById('newTitle').value;
-  if (!name) return;
-  const gameTiers = {};
-  GAMEMODES.forEach(gm => {
-    const val = document.getElementById('tier_' + gm).value;
-    if (val) gameTiers[gm] = val;
-  });
-  push(playersRef, { name, points, region, title, gameTiers });
-  document.getElementById('newName').value  = '';
-  document.getElementById('newPoints').value = '';
-  GAMEMODES.forEach(gm => document.getElementById('tier_' + gm).value = '');
-};
-
-// ── Remove player → deleted from Firebase ───────────────────
-window.removePlayer = function(firebaseKey) {
-  remove(ref(db, 'players/' + firebaseKey));
-};
-
-// ── Category filter ──────────────────────────────────────────
-window.filterCat = function(cat) {
-  currentCat = cat;
-  document.querySelectorAll('.cat-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.trim().includes(cat));
-  });
-  renderList();
-};
-
-// ── Admin login ──────────────────────────────────────────────
-document.getElementById('logoBtn').addEventListener('click', () => {
-  if (adminOpen) {
-    adminOpen = false;
-    document.getElementById('adminPanel').style.display = 'none';
-    renderList();
-    return;
-  }
-  document.getElementById('loginModal').classList.add('open');
-  setTimeout(() => document.getElementById('pwInput').focus(), 80);
-});
-
-window.closeModal = function() {
-  document.getElementById('loginModal').classList.remove('open');
-  document.getElementById('pwInput').value = '';
-  document.getElementById('loginErr').style.display = 'none';
-};
-
-window.doLogin = function() {
-  if (document.getElementById('pwInput').value === 'admin123') {
-    closeModal();
-    adminOpen = true;
-    document.getElementById('adminPanel').style.display = 'block';
-    renderList();
-  } else {
-    document.getElementById('loginErr').style.display = 'block';
-    document.getElementById('pwInput').value = '';
-  }
-};
-
-document.getElementById('loginModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-</script>
-</body>
-</html>
+          <select id="newTitl
