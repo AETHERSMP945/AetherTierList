@@ -1,216 +1,326 @@
 <!DOCTYPE html>
-<html lang="mn">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AetherSMP Tier List</title>
-</head>
-<body>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AETHER – Rankings</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-    import { getDatabase, ref, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+  :root {
+    --bg: #0d0e14;
+    --surface: #13151f;
+    --surface2: #1a1d2b;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c8fff;
+    --accent2: #a78bfa;
+    --gold: #f5c542;
+    --silver: #c0c7d4;
+    --bronze: #cd7f4a;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --green: #4ade80;
+    --red: #f87171;
+  }
 
-    // ============================================================
-    // Firebase тохиргоо
-    // ============================================================
-    const firebaseConfig = {
-      apiKey:            "AIzaSyDtyl8ocwj2QG71DiaYYgoshUUe_RIrwF0",
-      authDomain:        "aethersmptierlist.firebaseapp.com",
-      databaseURL:       "https://aethersmptierlist-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId:         "aethersmptierlist",
-      storageBucket:     "aethersmptierlist.appspot.com",
-      messagingSenderId: "334464990485",
-      appId:             "1:334464990485:web:e4cbe9019a13f33309fd1c",
-      measurementId:     "G-SZ3MJ220HW"
-    };
-    // ============================================================
+  html { scroll-behavior: smooth; }
 
-    const app = initializeApp(firebaseConfig);
-    const db  = getDatabase(app);
-    const playersRef = ref(db, 'players');
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-    const TITLE_ICONS = {
-      'Combat Grandmaster': '👑',
-      'Combat Master':      '💎',
-      'Combat Ace':         '🔷',
-      'Combat Veteran':     '⭐',
-      'Combat Apprentice':  '🔹',
-    };
+  /* BG grid lines */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(108,143,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(108,143,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    const GAMEMODES = ['Sword','Axe','Pot','Vanilla','UHC','NethOP','SMP','Mace'];
-    const GAMEMODE_SVG = {
-      Sword:   'https://mctiers.com/tier_icons/sword.svg',
-      Axe:     'https://mctiers.com/tier_icons/axe.svg',
-      Pot:     'https://mctiers.com/tier_icons/pot.svg',
-      Vanilla: 'https://mctiers.com/tier_icons/vanilla.svg',
-      UHC:     'https://mctiers.com/tier_icons/uhc.svg',
-      NethOP:  'https://mctiers.com/tier_icons/nethop.svg',
-      SMP:     'https://mctiers.com/tier_icons/smp.svg',
-      Mace:    'https://mctiers.com/tier_icons/mace.svg',
-    };
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,14,20,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem;
+    height: 64px;
+  }
 
-    let players    = [];
-    let adminOpen  = false;
-    let currentCat = 'Overall';
+  .nav-logo {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    background: linear-gradient(135deg, #6c8fff, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    cursor: pointer;
+    user-select: none;
+  }
 
-    // ── Listen for real-time changes from Firebase ──────────────
-    onValue(playersRef, (snapshot) => {
-      players = [];
-      if (snapshot.exists()) {
-        snapshot.forEach(child => {
-          players.push({ firebaseKey: child.key, ...child.val() });
-        });
-      }
-      renderList();
-    });
+  .nav-links {
+    display: flex; align-items: center; gap: 2rem;
+    list-style: none;
+  }
 
-    // ── Rendering ───────────────────────────────────────────────
-    function rankMedal(r) {
-      return r===1 ? '🥇' : r===2 ? '🥈' : r===3 ? '🥉' : '';
-    }
-    
-    function rankClass(r) {
-      return r===1 ? 'top1' : r===2 ? 'top2' : r===3 ? 'top3' : '';
-    }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
 
-    function renderList() {
-      const query  = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
-      let sorted   = [...players].sort((a,b) => b.points - a.points);
-      
-      if (query) sorted = sorted.filter(p => p.name.toLowerCase().includes(query));
-      
-      const playerListEl = document.getElementById('playerList');
-      if (playerListEl) {
-        playerListEl.innerHTML = sorted.map((p, i) => {
-          const rank = i + 1;
-          const ti   = TITLE_ICONS[p.title] || '⭐';
+  .nav-links a:hover, .nav-links a.active { color: var(--text); }
+  .nav-links a.active { color: var(--accent); }
 
-          let tBadges = '';
-          if (currentCat !== 'Overall' && GAMEMODES.includes(currentCat)) {
-            const t      = p.gameTiers ? p.gameTiers[currentCat] : null;
-            const svgSrc = GAMEMODE_SVG[currentCat] || '';
-            tBadges = t
-              ? `<div class="tier-badge tier-${t}" style="width:48px;height:48px;gap:2px;">
-                   <img src="${svgSrc}" style="width:20px;height:20px;object-fit:contain;" alt="${currentCat}" />
-                   <span class="tb-label" style="font-size:0.6rem;">${t}</span>
-                 </div>`
-              : `<span style="font-size:0.75rem;color:var(--muted);">—</span>`;
-          } else {
-            tBadges = GAMEMODES.map(gm => {
-              const t = p.gameTiers ? p.gameTiers[gm] : null;
-              if (!t) return '';
-              return `<div class="tier-badge tier-${t}" title="${gm}: ${t}">
-                        <img src="${GAMEMODE_SVG[gm]}" style="width:14px;height:14px;object-fit:contain;" alt="${gm}" />
-                        <span class="tb-label">${t}</span>
-                      </div>`;
-            }).join('');
-          }
+  .discord-link {
+    display: flex; align-items: center; gap: 8px;
+    background: #5865F2;
+    color: #fff !important;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    transition: opacity 0.2s !important;
+  }
+  .discord-link:hover { opacity: 0.85; color: #fff !important; }
 
-          const removeBtn = adminOpen
-            ? `<button class="btn-remove" onclick="window.removePlayer('${p.firebaseKey}');event.stopPropagation()">✕</button>`
-            : '';
+  /* HERO */
+  .hero {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+  }
 
-          return `
-            <div class="player-row ${rankClass(rank)}">
-              <div class="rank-cell rank-${rank <= 3 ? rank : 'other'}">
-                ${rankMedal(rank) ? `<span class="rank-medal">${rankMedal(rank)}</span>` : rank + '.'}
-              </div>
-              <div class="player-info">
-                <div class="avatar">${p.name.slice(0,2).toUpperCase()}</div>
-                <div class="player-name-wrap">
-                  <div class="player-name">${p.name}</div>
-                  <div class="player-title"><span class="title-icon">${ti}</span>${p.title}</div>
-                </div>
-                ${removeBtn}
-              </div>
-              <div><span class="region-badge region-${p.region}">${p.region}</span></div>
-              <div class="tiers-cell">${tBadges}</div>
-              <div class="points-cell">${p.points.toLocaleString()} pts</div>
-            </div>`;
-        }).join('');
-      }
+  .hero h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, #fff 30%, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-      const total = players.length;
-      const top   = total ? players.reduce((a,b) => b.points > a.points ? b : a) : null;
-      const avg   = total ? Math.round(players.reduce((s,p) => s+p.points, 0) / total) : 0;
-      
-      const statsBarEl = document.getElementById('statsBar');
-      if (statsBarEl) {
-        statsBarEl.innerHTML = `
-          <div class="stat-chip"><span>${total}</span>Players</div>
-          <div class="stat-chip"><span>${top ? top.name : '–'}</span>Top Player</div>
-          <div class="stat-chip"><span>${avg}</span>Avg Points</div>
-          <div class="stat-chip"><span>${currentCat}</span>Category</div>
-        `;
-      }
-    }
+  .hero p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    letter-spacing: 0.05em;
+  }
 
-    // ── Add player ──────────────────────────────────────────────
-    window.addPlayer = function() {
-      const name   = document.getElementById('newName').value.trim();
-      const points = parseInt(document.getElementById('newPoints').value) || 0;
-      const region = document.getElementById('newRegion').value;
-      const title  = document.getElementById('newTitle').value;
-      if (!name) return;
-      const gameTiers = {};
-      GAMEMODES.forEach(gm => {
-        const val = document.getElementById('tier_' + gm).value;
-        if (val) gameTiers[gm] = val;
-      });
-      push(playersRef, { name, points, region, title, gameTiers });
-      document.getElementById('newName').value  = '';
-      document.getElementById('newPoints').value = '';
-      GAMEMODES.forEach(gm => document.getElementById('tier_' + gm).value = '');
-    };
+  /* CATEGORY TABS */
+  .categories {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    flex-wrap: wrap; gap: 6px;
+    padding: 1rem 2rem 0;
+    max-width: 900px;
+    margin: 0 auto;
+  }
 
-    // ── Remove player ───────────────────────────────────────────
-    window.removePlayer = function(firebaseKey) {
-      remove(ref(db, 'players/' + firebaseKey));
-    };
+  .cat-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    min-width: 72px;
+  }
+  .cat-btn:hover { border-color: rgba(108,143,255,0.35); color: var(--text); }
+  .cat-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(108,143,255,0.08);
+  }
+  .cat-icon { font-size: 1.2rem; width: 22px; height: 22px; object-fit: contain; }
 
-    // ── Category filter ──────────────────────────────────────────
-    window.filterCat = function(cat) {
-      currentCat = cat;
-      document.querySelectorAll('.cat-btn').forEach(b => {
-        b.classList.toggle('active', b.textContent.trim().includes(cat));
-      });
-      renderList();
-    };
+  /* MAIN CONTENT */
+  main {
+    position: relative; z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 4rem;
+  }
 
-    // ── Admin login ──────────────────────────────────────────────
-    document.getElementById('logoBtn').addEventListener('click', () => {
-      if (adminOpen) {
-        adminOpen = false;
-        document.getElementById('adminPanel').style.display = 'none';
-        renderList();
-        return;
-      }
-      document.getElementById('loginModal').classList.add('open');
-      setTimeout(() => document.getElementById('pwInput').focus(), 80);
-    });
-    
-    window.closeModal = function() {
-      document.getElementById('loginModal').classList.remove('open');
-      document.getElementById('pwInput').value = '';
-      document.getElementById('loginErr').style.display = 'none';
-    };
-    
-    window.doLogin = function() {
-      if (document.getElementById('pwInput').value === 'admin123') {
-        closeModal();
-        adminOpen = true;
-        document.getElementById('adminPanel').style.display = 'block';
-        renderList();
-      } else {
-        document.getElementById('loginErr').style.display = 'block';
-        document.getElementById('pwInput').value = '';
-      }
-    };
-    
-    document.getElementById('loginModal').addEventListener('click', function(e) {
-      if (e.target === this) closeModal();
-    });
-  </script>
-</body>
-</html>
+  /* TABLE HEADER */
+  .table-header {
+    display: grid;
+    grid-template-columns: 60px 1fr 90px 130px 90px;
+    padding: 0.6rem 1rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+  }
+
+  /* PLAYER ROW */
+  .player-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 90px 130px 90px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    animation: fadeIn 0.4s ease both;
+  }
+
+  .player-row:hover {
+    border-color: rgba(108,143,255,0.3);
+    background: var(--surface2);
+    transform: translateX(3px);
+  }
+
+  .player-row:nth-child(1) { animation-delay: 0.05s; }
+  .player-row:nth-child(2) { animation-delay: 0.1s; }
+  .player-row:nth-child(3) { animation-delay: 0.15s; }
+  .player-row:nth-child(4) { animation-delay: 0.2s; }
+  .player-row:nth-child(5) { animation-delay: 0.25s; }
+  .player-row:nth-child(6) { animation-delay: 0.3s; }
+  .player-row:nth-child(7) { animation-delay: 0.35s; }
+  .player-row:nth-child(8) { animation-delay: 0.4s; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Rank */
+  .rank-cell {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .rank-1 { color: var(--gold); }
+  .rank-2 { color: var(--silver); }
+  .rank-3 { color: var(--bronze); }
+
+  .rank-medal { font-size: 1rem; }
+
+  /* Player info */
+  .player-info {
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .avatar {
+    width: 42px; height: 42px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  .player-name-wrap {}
+  .player-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+  }
+
+  .player-title {
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 5px;
+    margin-top: 2px;
+  }
+
+  .title-icon { font-size: 0.8rem; }
+
+  /* Region badge */
+  .region-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .region-NA { background: rgba(108,143,255,0.15); color: #6c8fff; border: 1px solid rgba(108,143,255,0.3); }
+  .region-EU { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+  .region-AS { background: rgba(251,146,60,0.1); color: #fb923c; border: 1px solid rgba(251,146,60,0.25); }
+  .region-SA { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+
+  /* Tiers display */
+  .tiers-cell {
+    display: flex; flex-wrap: wrap; gap: 4px;
+  }
+
+  .tier-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border: 1px solid;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .tier-badge .tb-icon { font-size: 0.8rem; }
+  .tier-badge .tb-label { font-size: 0.5rem; letter-spacing: 0.05em; }
+
+  .tier-HT1 { background: rgba(245,197,66,0.15);  color: #f5c542; border-color: rgba(245,197,66,0.4); }
+  .tier-HT2 { background: rgba(251,146,60,0.13);  color: #fb923c; border-color: rgba(251,146,60,0.35); }
+  .tier-HT3 { background: rgba(248,113,113,0.12); color: #f87171; border-color: rgba(248,113,113,0.3); }
+  .tier-HT4 { background: rgba(167,139,250,0.13); color: #a78bfa; border-color: rgba(167,139,250,0.35); }
+  .tier-HT5 { background: rgba(96,165,250,0.12);  color: #60a5fa; border-color: rgba(96,165,250,0.3); }
+  .tier-LT1 { background: rgba(34,211,238,0.11);  color: #22d3ee; border-color: rgba(34,211,238,0.28); }
+  .tier-LT2 { background: rgba(74,222,128,0.1);   color: #4ade80; border-color: rgba(74,222,128,0.25); }
+  .tier-LT3 { background: rgba(108,143,255,0.11); color: #6c8fff; border-color: rgba(108,143,255,0.28); }
+  .tier-LT4 { background: rgba(148,163,184,0.1);  color: #94a3b8; border-color: rgba(148,163,184,0.25); }
+  .tier-LT5 { background: rgba(100,116,139,0.08); color: #64748b; border-color: rgba(100,116,139,0.2); }
+
+  /* Points */
+  .points-cell {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-align: right;
+  }
+
+  /* TOP 3 special */
+  .player-row.top1 { border-color: rgba(245,197,66,0.35); background: rgba(245,197,66,0.04); }
+  .player-row.top2 { border-color: rgba(192,199,212,0.3); background: rgba(192,199,212,0.03); }
+  .player-row.top3 { border-color: rgba(205,127,74,0.3); background: rgba(205,127,74,0.03); }
+
+  /* ADMIN MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index
